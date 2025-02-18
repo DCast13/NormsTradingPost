@@ -37,6 +37,13 @@
 + Git/Github
 + MongoDB Atlas
 
+### ***Current Progress:***
++ Creating issues in git
++ Working on user stories and issues for sprints 1-2
++ Adding milestones
++ Starting HTML code
+
+
 
 ### ***TABLE OF CONTENTS:*** 
 
