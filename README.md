@@ -22,23 +22,24 @@
 
 ### ***INSTALLATION:*** 
 
-1.Clone repository: https://github.com/DCast13/NormsTradingPost.git
+1. Clone repository: https://github.com/DCast13/NormsTradingPost.git
 
-2.Navigate to the project directory: Cd _______
+2. Navigate to the project directory: Cd _______
 
-3.Install necessary dependencies: npm install
+3. Install necessary dependencies: npm install
 
-4.Start the server: npm start
+4. Start the server: npm start
 
 ### ***TECHNOLOGIES USED:*** 
 
 + VS Code 
 + Node/Javascript
-+ Git/Github
++ Git/GitHub
 + MongoDB Atlas
 
 ### ***CURRENT PROGRESS:***
-+ Creating issues in git
++ Creating issues/tasks in git
++ Backlog
 + Working on user stories and issues for sprints 1-2
 + Adding milestones
 + Starting HTML code
