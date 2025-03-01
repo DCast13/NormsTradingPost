@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/head') %>
+
+  <body>
+    <%- include('partials/header') %>
+
+    <div class="sell-container">
+      <h1>Sell Item</h1>
+      <h2>Subtitle</h2>
+      <div class="form-container">
+        <form>
+          <label for="name">Name of Item</label>
+          <input type="text" id="name" placeholder="Value" />
+
+          <label for="condition">Type of Condition</label>
+          <input type="text" id="condition" placeholder="Value" />
+
+          <label for="price">Price</label>
+          <input type="text" id="price" placeholder="Value" />
+
+          <label for="description">Description</label>
+          <textarea id="description" placeholder="Value"></textarea>
+
+          <button type="submit" class="primary-button">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

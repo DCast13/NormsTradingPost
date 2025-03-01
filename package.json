@@ -1,6 +1,27 @@
 {
   "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
     "node": "^20.18.3",
     "nodemon": "^3.1.9"
-  }
+  },
+  "name": "normstradingpost",
+  "version": "1.0.0",
+  "description": "Norm's Trading Post is a platform exclusively for students and professors to buy and sell goods. Users must log in with their UNCC credentials to access the platform, ensuring a secure campus-exclusive marketplace.",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DCast13/NormsTradingPost.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DCast13/NormsTradingPost/issues"
+  },
+  "homepage": "https://github.com/DCast13/NormsTradingPost#readme"
 }
