@@ -2,6 +2,7 @@
   "dependencies": {
     "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "mongoose": "^8.12.1",
     "node": "^20.18.3",
     "nodemon": "^3.1.9"
   },
