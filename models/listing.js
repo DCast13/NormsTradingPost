@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Offer = require('./offer');
 
+// Define the schema for a listing
 const listingSchema = new Schema({
     title: {type: String, required: [true, 'Title is required']},
     seller: {type: Schema.Types.ObjectId, ref: 'User'},
@@ -13,9 +13,10 @@ const listingSchema = new Schema({
     totalOffers: {type: Number, default: 0},
     highestOffer: {type: Number, default: 0}
 },
-{timestamps: true}
+{timestamps: true} // Automatically add createdAt and updatedAt timestamps
 );
 
+// Middleware to delete related offers when a listing is deleted
 listingSchema.pre('findOneAndDelete', function(next){
     const listingId = this.getQuery()['_id'];
     OffscreenCanvas.deleteMany({listing: listingId})
@@ -23,4 +24,5 @@ listingSchema.pre('findOneAndDelete', function(next){
     .catch(err => next(err));
 });
 
+// Export the Listing model
 module.exports = mongoose.model('Listing', listingSchema);

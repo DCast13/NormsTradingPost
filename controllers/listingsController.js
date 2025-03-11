@@ -19,17 +19,17 @@ exports.getAllListings = (req, res, next) => {
 };
 
 exports.new = (req, res) => {
-    res.render('./games/new');
+    res.render('./listings/new');
 };
 
 exports.create = (req, res, next) => {
     let listing = new model(req.body);
     listing.seller = req.session.user;
     if (req.file) {
-        listing.image = '/images/games/' + req.file.filename;
+        listing.image = '/images/listings/' + req.file.filename;
     }
     listing.save()
-    .then(game => res.redirect('/listings/'))
+    .then(listing => res.redirect('/listings/'))
     .catch(err => {
         if (err.name === 'ValidationError') {
             err.status = 400;
