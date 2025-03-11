@@ -175,7 +175,8 @@ footer {
   display: block;
   margin-top: 10px;
   font-size: 14px;
-  color: var(--secondary-jasper);
+  font-weight: 500;
+  color: var(--primary-green);
   text-decoration: none;
 }
 
@@ -346,6 +347,14 @@ section .testimonials {
   margin: 10px 0 5px;
 }
 
+/* TEMP */
+
+.product-card a {
+  color: var(--black);
+}
+
+/* TEMP CLOSE */
+
 .product-card p:first-of-type {
   font-weight: bold;
 }
@@ -355,37 +364,98 @@ section .testimonials {
   width: 100%;
 }
 
-.image-placeholder {
-  width: 300px;
-  height: 300px;
-  background: #e0e0e0;
+/* DETAILS.EJS */
+
+.details-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
+  margin: 20px auto;
+}
+
+.details-container img {
+  margin-right: 10%;
   border-radius: 8px;
-  margin-right: 20px;
 }
 
 .details {
-  flex: 1;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
 }
 
-.tag {
-  background: #c8f7c5;
+.details h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.details h3 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.details .tag {
+  display: inline-block;
+  background-color: var(--secondary-jasper);
+  color: var(--black);
   padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 14px;
+  width: 10%;
+  text-align: center;
 }
 
-.details select,
-.details button {
+.details p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.details label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.details select {
   width: 100%;
   padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: white;
+  margin-bottom: 20px;
+  border: 1px solid var(--primary-green);
+  border-radius: 4px;
 }
+
+.details button {
+  width: 80%;
+  padding: 15px;
+  margin: 0 auto;
+  background-color: var(--secondary-jasper);
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.details button:hover {
+  background-color: var(--primary-gold);
+}
+
+.details .faq {
+  margin-top: 20px;
+}
+
+.details .faq strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.details .faq p {
+  font-size: 14px;
+  color: #666;
+}
+
+/* DETAILS.EJS END */
 
 .faq {
   margin-top: 20px;

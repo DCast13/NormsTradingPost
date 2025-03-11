@@ -1,25 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <%- include('partials/head') %>
+  <%- include('../partials/head') %>
 
   <body>
-    <%- include('partials/header') %>
+    <%- include('../partials/header') %>
 
-    <div class="container">
-      <div class="image-placeholder">Image</div>
+    <div class="details-container">
+      <img src="/assets/images/blank.png" alt="Product" />
       <div class="details">
         <h2>Text Heading</h2>
         <span class="tag">Tag</span>
-        <div class="price">$50</div>
+        <h3>$50</h3>
         <p>Text</p>
-        <label>Label</label>
-        <select>
-          <option>Value</option>
-        </select>
-        <label>Label</label>
-        <select>
-          <option>Value</option>
-        </select>
+        <div>
+          <div class="dropdown">
+            <label>Label</label>
+            <select>
+              <option>Value 1</option>
+              <option>Value 2</option>
+              <option>Value 3</option>
+            </select>
+          </div>
+          <div class="dropdown">
+            <label>Label</label>
+            <select>
+              <option>Value 1</option>
+              <option>Value 2</option>
+              <option>Value 3</option>
+            </select>
+          </div>
+        </div>
         <button>Button</button>
         <div class="faq">
           <strong>Title</strong>
@@ -28,6 +38,6 @@
       </div>
     </div>
 
-    <%- include('partials/footer') %>
+    <%- include('../partials/footer') %>
   </body>
 </html>
