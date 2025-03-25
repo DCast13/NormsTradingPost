@@ -41,6 +41,27 @@ header {
   padding-bottom: 2rem;
 }
 
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.alert-success {
+  color: var(--primary-green);
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-danger {
+  color: var(--secondary-red);
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
 .header-container {
   display: flex;
   align-items: center;
@@ -148,28 +169,21 @@ footer {
 
 .primary-button {
   background-color: var(--primary-green);
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
   color: var(--secondary-jasper);
   width: 75%;
   margin-top: 10px;
+  display: inline-block;
 }
 
 .secondary-button {
   background-color: var(--secondary-jasper);
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
   color: var(--black);
   width: 50%;
   margin-top: 10px;
+  display: inline-block;
 }
-
-/* TEMP */
-.primary-button a {
-  color: var(--white);
-}
-
-.secondary-button a {
-  color: var(--black);
-}
-
-/* TEMP CLOSE */
 
 .forgot-password {
   display: block;

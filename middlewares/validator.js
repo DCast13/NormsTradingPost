@@ -43,7 +43,17 @@ exports.validateListing = [
 ];
 
 exports.validateUser = [
-  body("email").trim().normalizeEmail().isEmail().withMessage("Invalid email address"),
+  body("email")
+    .trim()
+    .normalizeEmail()
+    .isEmail()
+    .withMessage("Invalid email address")
+    .custom((value) => {
+      if (!value.endsWith("@charlotte.edu")) {
+        throw new Error("Email must be a @charlotte.edu address");
+      }
+      return true;
+    }),
   body("password").trim().isLength({ min: 4, max: 64 }).withMessage("Password must be between 4 and 64 characters"),
   (req, res, next) => {
     const errors = validationResult(req);

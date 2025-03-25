@@ -44,6 +44,8 @@ app.use(flash());
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
+  res.locals.isAuthenticated = req.session.userId ? true : false;
+  res.locals.currentPath = req.path;
   next();
 });
 
