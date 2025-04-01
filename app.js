@@ -7,10 +7,13 @@ const flash = require("connect-flash");
 const app = express();
 
 // Configure app
-let port = 3000;
+let port = 3001;
 let host = "localhost";
 app.set("view engine", "ejs");
 const mongUri = "mongodb+srv://admin:admin123@cluster0.zvlta.mongodb.net/normsTradingPost?retryWrites=true&w=majority&appName=Cluster0";
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 mongoose
@@ -29,7 +32,7 @@ app.use(
     secret: "ajfeirf90aeu9eroejfoefj",
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongoUrl: "mongodb://localhost:27017/normsTradingPost" }),
+    store: new MongoStore({ mongoUrl: mongUri }),
     cookie: { maxAge: 60 * 60 * 1000 },
   })
 );
@@ -37,16 +40,25 @@ app.use(
 // Middleware for flash messages
 app.use(flash());
 
-const indexRoutes = require("./routes/index");
-const userRoutes = require("./routes/user");
-const listingsRoutes = require("./routes/listings");
+// Set global variables for flash messages
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash("success_msg");
+  res.locals.error_msg = req.flash("error_msg");
+  res.locals.isAuthenticated = req.session.userId ? true : false;
+  res.locals.currentPath = req.path;
+  next();
+});
+
+const indexRoutes = require("./routes/indexRoute");
+const userRoutes = require("./routes/userRoute");
+const listingsRoutes = require("./routes/listingsRoute");
+
+app.use("/", indexRoutes);
+app.use("/", userRoutes);
+app.use("/", listingsRoutes);
 
 app.set("views", path.join(__dirname, "views"));
 
 app.locals.basedir = app.get("views/partials");
 
 app.use(express.static(path.join(__dirname, "public")));
-
-app.use("/", indexRoutes);
-app.use("/", userRoutes);
-app.use("/", listingsRoutes);
