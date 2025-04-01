@@ -29,9 +29,15 @@ exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
+
+    if (!user) {
+      req.flash("error_msg", "Invalid email or password");
+      return res.redirect("/login");
+    }
+
     const isMatch = await user.comparePassword(password);
 
-    if (!user || !isMatch) {
+    if (!isMatch) {
       req.flash("error_msg", "Invalid email or password");
       return res.redirect("/login");
     }
