@@ -1,4 +1,9 @@
 <footer>
+  <% if (success_msg && success_msg.length > 0) { %> <% success_msg.forEach(function(msg) { %>
+  <div class="alert alert-success"><%= success_msg %></div>
+  <% }); %> <% } %> <% if (error_msg && error_msg.length > 0) { %>
+  <div class="alert alert-danger"><%= error_msg %></div>
+  <% } %>
   <div class="footer-container">
     <a href="https://twitter.com" class="icon">
       <i class="fa-brands fa-x-twitter"></i>
