@@ -1,7 +1,9 @@
 const { body, validationResult } = require("express-validator");
 const validator = require("validator");
+const multer = require("multer");
+const path = require("path");
 
-exports.checkAuthenticated = (req, res, next) => {
+exports.alreadyAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return res.redirect("/browse");
   }
@@ -54,7 +56,20 @@ exports.validateUser = [
       }
       return true;
     }),
-  body("password").trim().isLength({ min: 4, max: 64 }).withMessage("Password must be between 4 and 64 characters"),
+  body("password")
+    .trim()
+    .custom((value) => {
+      if (value === "") {
+        return true; // Skip further validation if the password is empty
+      }
+      return value.length >= 8 && value.length <= 64;
+    })
+    .withMessage("Password must be between 8 and 64 characters"),
+  body("repassword").optional().trim().escape(),
+  body("username").optional().trim().escape(),
+  body("firstName").optional().trim().escape(),
+  body("lastName").optional().trim().escape(),
+  body("bio").optional().trim().escape(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -79,3 +94,25 @@ exports.validateOffer = [
     next();
   },
 ];
+
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../public/uploads/profile-pictures")); // Save files in this directory
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+  },
+});
+
+// File filter to allow only images
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed"), false);
+  }
+};
+
+// Multer middleware
+exports.uploadProfilePicture = multer({ storage, fileFilter });
