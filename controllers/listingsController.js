@@ -18,18 +18,18 @@ exports.getAllListings = (req, res, next) => {
     .catch(err => next(err));
 };
 
-exports.new = (req, res) => {
-    res.render('./listings/new');
+exports.sell = (req, res) => {
+    res.render('./listings/sell');
 };
 
 exports.create = (req, res, next) => {
     let listing = new model(req.body);
-    listing.seller = req.session.user;
+    listing.seller = req.session.userId;
     if (req.file) {
         listing.image = '/images/listings/' + req.file.filename;
     }
     listing.save()
-    .then(listing => res.redirect('/listings/'))
+    .then(listing => res.redirect('/listings/details/' + listing._id))
     .catch(err => {
         if (err.name === 'ValidationError') {
             err.status = 400;
@@ -92,4 +92,19 @@ exports.update = (req, res, next) => {
         }
         next(err);
     });
+};
+
+exports.delete = (req, res, next) => {
+    let id = req.params.id;
+    model.findOneAndDelete({_id: id}, {useFindAndModify: false})
+    .then(game=> {
+        if (game) {
+            res.redirect('/games');
+        } else {
+            let err = new Error('Cannot find a game with id: ' + id);
+            err.status = 404;
+            next(err);
+        }
+    })
+    .catch(err => next(err));
 };

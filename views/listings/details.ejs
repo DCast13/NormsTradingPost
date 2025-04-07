@@ -6,12 +6,12 @@
     <%- include('../partials/header') %>
 
     <div class="details-container">
-      <img src="/assets/images/blank.png" alt="Product" />
+      <img src="<%= listing.image %>" alt="<%=listing.name%>" />
       <div class="details">
-        <h2>Text Heading</h2>
+        <h2><%=listing.name%></h2>
         <span class="tag">Tag</span>
-        <h3>$50</h3>
-        <p>Text</p>
+        <h3><%=listing.price%></h3>
+        <p><%=listing.description%></p>
         <div>
           <div class="dropdown">
             <label>Label</label>

@@ -509,7 +509,8 @@ section .testimonials {
   margin-top: 5px;
 }
 
-.sell-container label {
+.sell-container label,
+.sell-container select {
   display: block;
   text-align: left;
   margin-top: 10px;
@@ -517,6 +518,7 @@ section .testimonials {
 }
 
 .sell-container input,
+.sell-container select,
 .sell-container textarea,
 .sell-container button {
   width: 90%;
