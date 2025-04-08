@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-const Listing = require('../../models/listing.js');
+const Listing = require('../../models/listing');
 
 describe('Listing Model', () => {
   it('should throw validation error if required fields are missing', async () => {

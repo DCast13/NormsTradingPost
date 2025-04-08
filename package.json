@@ -20,10 +20,9 @@
   "version": "1.0.0",
   "description": "Norm's Trading Post is a platform exclusively for students and professors to buy and sell goods. Users must log in with their UNCC credentials to access the platform, ensuring a secure campus-exclusive marketplace.",
   "main": "app.js",
-  "type": "module",
   "scripts": {
     "start": "nodemon app.js",
-    "test": "mocha --recursive tests/**/*.test.js"
+    "test": "mocha --loader node --recursive tests/**/*.test.js"
   },
   "repository": {
     "type": "git",

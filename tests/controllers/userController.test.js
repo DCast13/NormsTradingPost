@@ -1,7 +1,7 @@
-const sinon = require('sinon');
+import sinon from 'sinon';
 import { expect } from 'chai';
-const User = require('../../models/user.js');
-const userController = require('../../controllers/userController.js');
+const User = require('../../models/user');
+const userController = require('../../controllers/userController');
 
 describe('userController', () => {
   afterEach(() => {

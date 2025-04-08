@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+import sinon from 'sinon';
 import { expect } from 'chai';
 const listingsController = require('../../controllers/listingsController.js');
 const Listing = require('../../models/listing.js');

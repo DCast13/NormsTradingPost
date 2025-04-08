@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-const User = require('../../models/user.js');
+const User = require('../../models/user');
 
 describe('User Model', () => {
   it('should hash the password before saving', async () => {

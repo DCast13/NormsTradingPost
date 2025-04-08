@@ -2,7 +2,7 @@ const express = require("express");
 const controller = require("../controllers/listingsController");
 const router = express.Router();
 const { validateListing, ensureAuthenticated } = require("../middlewares/validator");
-const upload = require('./fileUpload');
+const upload = require('../middlewares/fileUpload');
 
 // Route to browse all listings
 router.get("/browse", ensureAuthenticated, controller.getAllListings);
