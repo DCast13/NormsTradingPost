@@ -13,7 +13,7 @@ const listingsRoutes = require("./routes/listingsRoute");
 const app = express();
 
 // Configure app
-let port = 3001;
+let port = 3000;
 let host = "localhost";
 app.set("view engine", "ejs");
 const mongUri = "mongodb+srv://admin:admin123@cluster0.zvlta.mongodb.net/normsTradingPost?retryWrites=true&w=majority&appName=Cluster0";
@@ -62,34 +62,34 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware for logging HTTP requests
-app.use(morgan('tiny'));
+app.use(morgan("tiny"));
 
 // Middleware to support HTTP verbs such as PUT and DELETE
-app.use(methodOverride('_method'));
+app.use(methodOverride("_method"));
 
 // Routes
-app.get('/', (req, res) => {
-  res.render('landing');
+app.get("/", (req, res) => {
+  res.render("landing");
 });
 
-app.use('/listings', listingsRoutes);
+app.use("/listings", listingsRoutes);
 
-app.use('/user', userRoutes);
+app.use("/user", userRoutes);
 
 // Middleware for handling 404 errors
 app.use((req, res, next) => {
-    let err = new Error('The server cannot locate ' + req.url);
-    err.status = 404;
-    next(err);
+  let err = new Error("The server cannot locate " + req.url);
+  err.status = 404;
+  next(err);
 });
 
 // Middleware for handling other errors
 app.use((err, req, res, next) => {
-    console.log(err.stack);
-    if (!err.status) {
-        err.status = 500;
-        err.message = 'Internal Server Error';
-    }
-    res.status(err.status);
-    res.render('error', { error: err });
+  console.log(err.stack);
+  if (!err.status) {
+    err.status = 500;
+    err.message = "Internal Server Error";
+  }
+  res.status(err.status);
+  res.render("error", { error: err });
 });
