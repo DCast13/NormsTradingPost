@@ -12,25 +12,18 @@
         <span class="tag">Tag</span>
         <h3><%=listing.price%></h3>
         <p><%=listing.description%></p>
-        <!-- <div>
-          <div class="dropdown">
-            <label>Label</label>
-            <select>
-              <option>Value 1</option>
-              <option>Value 2</option>
-              <option>Value 3</option>
-            </select>
-          </div>
-          <div class="dropdown">
-            <label>Label</label>
-            <select>
-              <option>Value 1</option>
-              <option>Value 2</option>
-              <option>Value 3</option>
-            </select>
-          </div>
-        </div>
-        <button>Button</button> -->
+
+        <% if (user == listing.seller._id) { %>
+          <form>
+            <div class="button-group">
+              <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
+            
+              <button type="submit" formmethod="POST" 
+              formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
+            </div>
+          </form>
+        <% } %>
+        
         <div class="faq">
           <strong>Title</strong>
           <p>Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.</p>

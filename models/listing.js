@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const Offer = require('./offer'); // Correctly import the Offer model
 
 // Define the schema for a listing
 const listingSchema = new Schema({
@@ -17,11 +18,11 @@ const listingSchema = new Schema({
 );
 
 // Middleware to delete related offers when a listing is deleted
-listingSchema.pre('findOneAndDelete', function(next){
+listingSchema.pre('findOneAndDelete', function(next) {
     const listingId = this.getQuery()['_id'];
-    OffscreenCanvas.deleteMany({listing: listingId})
-    .then(() => next())
-    .catch(err => next(err));
+    Offer.deleteMany({ listing: listingId })
+        .then(() => next())
+        .catch(err => next(err));
 });
 
 // Export the Listing model

@@ -3,7 +3,7 @@ const validator = require("validator");
 
 exports.checkAuthenticated = (req, res, next) => {
   if (req.session.userId) {
-    return res.redirect("/browse");
+    return res.redirect("/listings/browse");
   }
   next();
 };
