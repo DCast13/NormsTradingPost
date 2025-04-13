@@ -516,9 +516,25 @@ section .testimonials {
   font-size: 14px;
 }
 
+.sell-container select {
+  color: grey;
+}
+
+.sell-container select:not(:invalid) {
+  color: black;
+}
+
+.sell-container option {
+  color: black;
+}
+
 .sell-container input,
+.sell-container select,
 .sell-container textarea,
 .sell-container button {
+  display: inline-block;
+  box-sizing: border-box;
+  resize: vertical;
   width: 90%;
   padding: 10px;
   margin-top: 5px;

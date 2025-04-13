@@ -13,22 +13,22 @@ exports.ensureAuthenticated = (req, res, next) => {
     return next();
   } else {
     req.flash("error_msg", "Please log in to view that resource");
-    res.redirect("/login");
+    res.redirect("/user/login");
   }
 };
 
 exports.validateListing = [
-  body("title")
+  body("name")
     .trim()
     .notEmpty()
-    .withMessage("Title is required")
+    .withMessage("Name is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
   body("condition").trim().isIn(["New", "Like New", "Very Good", "Good", "Other"]).withMessage("Invalid condition"),
   body("price").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid price"),
-  body("details")
+  body("description")
     .trim()
     .notEmpty()
-    .withMessage("Details are required")
+    .withMessage("Description is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
   (req, res, next) => {
     const errors = validationResult(req);

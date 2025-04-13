@@ -1,17 +1,25 @@
 const express = require("express");
+const controller = require("../controllers/listingsController");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middlewares/validator");
+const { validateListing, ensureAuthenticated } = require("../middlewares/validator");
+const upload = require('../middlewares/fileUpload');
 
-router.get("/browse", ensureAuthenticated, (req, res) => {
-  res.render("listings/browse");
-});
+// Browse all listings
+router.get("/browse", ensureAuthenticated, controller.getAllListings);
 
-router.get("/details", ensureAuthenticated, (req, res) => {
-  res.render("listings/details");
-});
+// View details of a listing by id
+router.get("/details/:id", ensureAuthenticated, controller.details);
 
-router.get("/sell", ensureAuthenticated, (req, res) => {
-  res.render("listings/sell");
-});
+// Sell page
+router.get("/sell", ensureAuthenticated, controller.sell);
+
+// Create a new listing
+router.post("/", ensureAuthenticated, upload, validateListing, controller.create);
+
+// Edit a listing
+router.get("/edit/:id", ensureAuthenticated, controller.edit);
+
+// Update a listing
+router.put("/:id", ensureAuthenticated, upload, validateListing, controller.update);
 
 module.exports = router;
