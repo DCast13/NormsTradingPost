@@ -22,4 +22,7 @@ router.get("/edit/:id", ensureAuthenticated, controller.edit);
 // Update a listing
 router.put("/:id", ensureAuthenticated, upload, validateListing, controller.update);
 
+// Delete a listing
+router.delete("/:id", ensureAuthenticated, controller.delete);
+
 module.exports = router;

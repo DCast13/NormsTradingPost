@@ -49,7 +49,7 @@ exports.details = (req, res, next) => {
     model.findById(id).populate('seller', 'firstName lastName')
         .then(listing => {
             if (listing) {
-                res.render('./listings/details', { listing });
+                res.render('./listings/details', { listing, user: req.session.userId });
             } else {
                 let err = new Error('Cannot find a listing with id: ' + id);
                 err.status = 404;
@@ -104,11 +104,11 @@ exports.update = (req, res, next) => {
 exports.delete = (req, res, next) => {
     let id = req.params.id;
     model.findOneAndDelete({ _id: id }, { useFindAndModify: false })
-        .then(game => {
-            if (game) {
-                res.redirect('/games');
+        .then(listing => {
+            if (listing) {
+                res.redirect('/listings/browse');
             } else {
-                let err = new Error('Cannot find a game with id: ' + id);
+                let err = new Error('Cannot find a listing with id: ' + id);
                 err.status = 404;
                 next(err);
             }

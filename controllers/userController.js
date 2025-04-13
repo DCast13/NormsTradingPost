@@ -63,10 +63,10 @@ exports.login = async (req, res, next) => {
 
 exports.profile = (req, res, next)=>{
   let id = req.session.user;
-  Promise.all([model.findById(id), Game.find({seller: id}), Offer.find({seller: id}).populate('game', 'title')])
+  Promise.all([model.findById(id), Listing.find({seller: id}), Offer.find({seller: id}).populate('listing', 'name')])
   .then(results=>{
-      const [user, games, offers] = results;
-      res.render('./user/profile', {user, games, offers});
+      const [user, listings, offers] = results;
+      res.render('./user/profile', {user, listings, offers});
   })
   .catch(err=>next(err));
 };
