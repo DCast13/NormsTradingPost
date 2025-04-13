@@ -4,22 +4,22 @@ const router = express.Router();
 const { validateListing, ensureAuthenticated } = require("../middlewares/validator");
 const upload = require('../middlewares/fileUpload');
 
-// Route to browse all listings
+// Browse all listings
 router.get("/browse", ensureAuthenticated, controller.getAllListings);
 
-// Route to view details of a specific listing
+// View details of a listing by id
 router.get("/details/:id", ensureAuthenticated, controller.details);
 
-// Route to render the sell page
+// Sell page
 router.get("/sell", ensureAuthenticated, controller.sell);
 
-// Route to create a new listing
+// Create a new listing
 router.post("/", ensureAuthenticated, upload, validateListing, controller.create);
 
-// Route to edit a listing
+// Edit a listing
 router.get("/edit/:id", ensureAuthenticated, controller.edit);
 
-// Route to update a listing
-router.post("/edit/:id", ensureAuthenticated, upload, validateListing, controller.update);
+// Update a listing
+router.put("/:id", ensureAuthenticated, upload, validateListing, controller.update);
 
 module.exports = router;
