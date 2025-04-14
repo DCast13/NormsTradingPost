@@ -7,8 +7,8 @@ exports.getAllListings = (req, res, next) => {
 
     const query = search ? {
         $or: [
-            { title: { $regex: search, $options: 'i' } },
-            { details: { $regex: search, $options: 'i' } }
+            { name: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } }
         ],
         active: true
     } : { active: true };

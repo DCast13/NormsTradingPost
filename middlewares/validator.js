@@ -1,6 +1,8 @@
 const { body, validationResult } = require("express-validator");
 const validator = require("validator");
 
+// Middleware to check if the user is already authenticated
+// Redirects to the browse page if the user is logged in
 exports.checkAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return res.redirect("/listings/browse");
@@ -8,6 +10,8 @@ exports.checkAuthenticated = (req, res, next) => {
   next();
 };
 
+// Middleware to ensure the user is authenticated
+// Redirects to the login page if the user is not logged in
 exports.ensureAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return next();
@@ -17,19 +21,35 @@ exports.ensureAuthenticated = (req, res, next) => {
   }
 };
 
+// Middleware to validate listing data
 exports.validateListing = [
+  // Validate and sanitize the name field
   body("name")
     .trim()
     .notEmpty()
     .withMessage("Name is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
-  body("condition").trim().isIn(["New", "Like New", "Very Good", "Good", "Other"]).withMessage("Invalid condition"),
-  body("price").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid price"),
+
+  // Validate the condition field to ensure it matches allowed values
+  body("condition")
+    .trim()
+    .isIn(["New", "Like New", "Very Good", "Good", "Other"])
+    .withMessage("Invalid condition"),
+
+  // Validate the price field to ensure it is a valid currency value
+  body("price")
+    .trim()
+    .isCurrency({ allow_negatives: false })
+    .withMessage("Invalid price"),
+
+  // Validate and sanitize the description field
   body("description")
     .trim()
     .notEmpty()
     .withMessage("Description is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
+
+  // Middleware to handle validation errors
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -42,7 +62,9 @@ exports.validateListing = [
   },
 ];
 
+// Middleware to validate user data
 exports.validateUser = [
+  // Validate and normalize the email field
   body("email")
     .trim()
     .normalizeEmail()
@@ -54,7 +76,14 @@ exports.validateUser = [
       }
       return true;
     }),
-  body("password").trim().isLength({ min: 4, max: 64 }).withMessage("Password must be between 4 and 64 characters"),
+
+  // Validate the password field to ensure it meets length requirements
+  body("password")
+    .trim()
+    .isLength({ min: 4, max: 64 })
+    .withMessage("Password must be between 4 and 64 characters"),
+
+  // Middleware to handle validation errors
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -66,8 +95,15 @@ exports.validateUser = [
   },
 ];
 
+// Middleware to validate offer data
 exports.validateOffer = [
-  body("amount").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid offer amount"),
+  // Validate the amount field to ensure it is a valid currency value
+  body("amount")
+    .trim()
+    .isCurrency({ allow_negatives: false })
+    .withMessage("Invalid offer amount"),
+
+  // Middleware to handle validation errors
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

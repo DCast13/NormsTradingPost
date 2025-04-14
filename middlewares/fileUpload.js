@@ -12,13 +12,17 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    const mimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (mimeTypes.includes(file.mimetype)) {
-        cb(null, true);
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true); // Accept the file
     } else {
-        cb(new Error('Invalid file type. Only JPEG, PNG, and GIF images are allowed.'), false);
+      // Reject the file and provide a descriptive error message
+      const error = new Error('Invalid file type. Only JPEG, PNG, and GIF images are allowed.');
+      error.status = 400; // Bad Request
+      cb(error, false);
     }
-};
+  };
 
 const upload = multer({
     storage,

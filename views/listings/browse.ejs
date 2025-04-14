@@ -55,56 +55,17 @@
         </div>
 
         <div class="product-grid">
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
-          <div class="product-card">
-            <img src="/assets/images/blank.png" alt="Product" />
-            <p><a href="/details">Product Title</a></p>
-            <p class="price">Asking Price: $0</p>
-          </div>
+          <% if (listings.length) { %>
+            <% listings.forEach(listing => { %>
+              <div class="product-card">
+                <img src="<%= listing.image %>" alt="<%= listing.name %>" />
+                <p><a href="/listings/<%= listing.id %>"><%= listing.name %></a></p>
+                <p class="price">Asking Price: $<%= listing.price %></p>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <p>There are no listings to display.</p>
+          <% } %>
         </div>
       </div>
     </div>
