@@ -84,46 +84,46 @@ header {
 }
 
 .search-bar {
-  flex-grow: 1; /* Ensures the search bar takes up available space */
-  padding: 10px; /* Adds padding for better usability */
-  border: 1px solid var(--primary-green); /* Matches your theme */
-  border-radius: 20px; /* Rounded corners for a modern look */
-  outline: none; /* Removes default focus outline */
-  font-size: 16px; /* Increases font size for readability */
-  transition: box-shadow 0.3s ease; /* Smooth focus effect */
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid var(--primary-green);
+  border-radius: 20px;
+  outline: none;
+  font-size: 16px;
+  transition: box-shadow 0.3s ease;
 }
 
 .search-bar:focus {
-  box-shadow: 0 0 5px var(--primary-green); /* Adds a glow effect on focus */
+  box-shadow: 0 0 5px var(--primary-green);
 }
 
 .search-button {
-  background-color: var(--primary-green); /* Matches your primary theme color */
-  color: var(--white); /* White text for contrast */
-  border: none; /* Removes default border */
-  padding: 10px 15px; /* Adds padding for better clickability */
-  border-radius: 20px; /* Rounded corners to match the search bar */
-  cursor: pointer; /* Changes cursor to pointer on hover */
-  font-size: 16px; /* Matches the font size of the search bar */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover and click effects */
+  background-color: var(--primary-green);
+  color: var(--white);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .search-button:hover {
-  background-color: var(--primary-gold); /* Changes color on hover */
+  background-color: var(--primary-gold);
 }
 
 .search-button i {
-  color: var(--primary-gold); /* Sets the search icon color to gold by default */
-  font-size: 18px; /* Adjust the size if needed */
-  transition: color 0.3s ease; /* Smooth transition for hover effect */
+  color: var(--primary-gold);
+  font-size: 18px;
+  transition: color 0.3s ease;
 }
 
 .search-button:hover i {
-  color: var(--primary-green); /* Changes the icon color to primary green on hover */
+  color: var(--primary-green);
 }
 
 .search-button:active {
-  transform: scale(0.95); /* Adds a slight "press" effect on click */
+  transform: scale(0.95);
 }
 
 .header-icons {
