@@ -7,7 +7,12 @@
     <% } %>
       <img src="/assets/images/NORM.png" alt="Logo" />
     </a>
-    <input type="text" class="search-bar" placeholder="Search..." />
+    <form action="/listings/browse" method="GET" class="search-form">
+      <input type="text" class="search-bar" name="search" placeholder="Search..." />
+      <button type="submit" class="search-button">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
     <div class="header-icons">
       <a href="#" class="icon">
         <i class="fa-regular fa-heart"></i>

@@ -75,13 +75,55 @@ header {
   height: 50px;
 }
 
+.search-form {
+  display: flex;
+  width: 100%;
+  max-width: 500px;
+  align-items: center;
+  gap: 5px;
+}
+
 .search-bar {
-  flex-grow: 0.25;
-  margin: 0 20px;
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  outline: none;
+  flex-grow: 1; /* Ensures the search bar takes up available space */
+  padding: 10px; /* Adds padding for better usability */
+  border: 1px solid var(--primary-green); /* Matches your theme */
+  border-radius: 20px; /* Rounded corners for a modern look */
+  outline: none; /* Removes default focus outline */
+  font-size: 16px; /* Increases font size for readability */
+  transition: box-shadow 0.3s ease; /* Smooth focus effect */
+}
+
+.search-bar:focus {
+  box-shadow: 0 0 5px var(--primary-green); /* Adds a glow effect on focus */
+}
+
+.search-button {
+  background-color: var(--primary-green); /* Matches your primary theme color */
+  color: var(--white); /* White text for contrast */
+  border: none; /* Removes default border */
+  padding: 10px 15px; /* Adds padding for better clickability */
+  border-radius: 20px; /* Rounded corners to match the search bar */
+  cursor: pointer; /* Changes cursor to pointer on hover */
+  font-size: 16px; /* Matches the font size of the search bar */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover and click effects */
+}
+
+.search-button:hover {
+  background-color: var(--primary-gold); /* Changes color on hover */
+}
+
+.search-button i {
+  color: var(--primary-gold); /* Sets the search icon color to gold by default */
+  font-size: 18px; /* Adjust the size if needed */
+  transition: color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.search-button:hover i {
+  color: var(--primary-green); /* Changes the icon color to primary green on hover */
+}
+
+.search-button:active {
+  transform: scale(0.95); /* Adds a slight "press" effect on click */
 }
 
 .header-icons {
@@ -318,6 +360,7 @@ section .testimonials {
 .products-container {
   flex: 1;
   margin-left: 20px;
+  margin-right: 20px;
 }
 
 .sort-buttons {
@@ -349,10 +392,16 @@ section .testimonials {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   text-align: center;
   aspect-ratio: 1 / 1.5;
+  width: 250px;
+  height: 375px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .product-card img {
   width: 100%;
+  height: 70%;
   object-fit: cover;
   border-radius: 5px;
 }
@@ -391,6 +440,9 @@ section .testimonials {
 .details-container img {
   margin-right: 10%;
   border-radius: 8px;
+  max-width: 100%;
+  max-height: 400px;
+  object-fit: contain;
 }
 
 .details {
