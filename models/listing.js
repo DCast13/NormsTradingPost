@@ -10,9 +10,11 @@ const listingSchema = new Schema({
     price: {type: Number, required: [true, 'Price is required'], min: 0.01},
     description: {type: String, required: [true, 'A description is required'], minLength: [10, 'The description must be at least 10 characters']},
     image: {type: String, required: [true, 'Image is required']},
+    rating: { type: Number, default: 0 },
     active: {type: Boolean, default: true},
     totalOffers: {type: Number, default: 0},
-    highestOffer: {type: Number, default: 0}
+    highestOffer: {type: Number, default: 0},
+    createdAt: { type: Date, default: Date.now }
 },
 {timestamps: true} // Automatically add createdAt and updatedAt timestamps
 );

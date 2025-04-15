@@ -3,6 +3,7 @@ const controller = require("../controllers/listingsController");
 const router = express.Router();
 const { validateListing, ensureAuthenticated } = require("../middlewares/validator");
 const upload = require('../middlewares/fileUpload');
+const { getAllListings } = require('../controllers/listingsController');
 
 // Browse all listings
 router.get("/browse", ensureAuthenticated, controller.getAllListings);
@@ -12,6 +13,13 @@ router.get("/details/:id", ensureAuthenticated, controller.details);
 
 // Sell page
 router.get("/sell", ensureAuthenticated, controller.sell);
+
+// Sort listings
+router.get('/', async (req, res) => {
+    const sort = req.query.sort || 'new';
+    const listings = await getAllListings(sort);
+    res.render('listings/browse', { listings, sort });
+  });
 
 // Create a new listing
 router.post("/", ensureAuthenticated, upload, validateListing, controller.create);

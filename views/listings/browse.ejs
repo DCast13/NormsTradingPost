@@ -48,10 +48,10 @@
       <!-- Product Listing -->
       <div class="products-container">
         <div class="sort-buttons">
-          <button class="active">New</button>
-          <button>Price ascending</button>
-          <button>Price descending</button>
-          <button>Rating</button>
+          <a href="/listings?sort=new" class="<%= sort === 'new' ? 'active' : '' %>">New</a>
+          <a href="/listings?sort=priceAsc" class="<%= sort === 'priceAsc' ? 'active' : '' %>">Price ascending</a>
+          <a href="/listings?sort=priceDesc" class="<%= sort === 'priceDesc' ? 'active' : '' %>">Price descending</a>
+          <a href="/listings?sort=rating" class="<%= sort === 'rating' ? 'active' : '' %>">Rating</a>
         </div>
 
         <div class="product-grid">

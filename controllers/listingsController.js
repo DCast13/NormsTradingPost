@@ -13,9 +13,26 @@ exports.getAllListings = (req, res, next) => {
         active: true
     } : { active: true };
 
+    // Determine the sorting option
+    let sortOption = {};
+    switch (sort) {
+        case 'priceAsc':
+            sortOption = { price: 1 }; // Ascending price
+            break;
+        case 'priceDesc':
+            sortOption = { price: -1 }; // Descending price
+            break;
+        case 'rating':
+            sortOption = { rating: -1 }; // Descending rating
+            break;
+        default:
+            sortOption = { createdAt: -1 }; // Newest first
+    }
+
+    // Fetch and sort listings
     model.find(query)
-        .sort({ price: 'asc' })
-        .then(listings => res.render('./listings/browse', { listings }))
+        .sort(sortOption)
+        .then(listings => res.render('./listings/browse', { listings, sort }))
         .catch(err => next(err));
 };
 
