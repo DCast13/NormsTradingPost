@@ -1,5 +1,8 @@
 const { body, validationResult } = require("express-validator");
 const validator = require("validator");
+const multer = require("multer");
+const path = require("path");
+
 
 // Middleware to check if the user is already authenticated
 // Redirects to the browse page if the user is logged in
@@ -62,6 +65,21 @@ exports.validateListing = [
   },
 ];
 
+// MIddleware to validate offers
+exports.validateOffer = [
+  body("amount").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid offer amount"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      let err = new Error("Validation failed");
+      err.status = 400;
+      err.errors = errors.array();
+      return next(err);
+    }
+    next();
+  },
+];
+
 // Middleware to validate user data
 exports.validateUser = [
   // Validate and normalize the email field
@@ -76,14 +94,20 @@ exports.validateUser = [
       }
       return true;
     }),
-
-  // Validate the password field to ensure it meets length requirements
   body("password")
     .trim()
-    .isLength({ min: 4, max: 64 })
-    .withMessage("Password must be between 4 and 64 characters"),
-
-  // Middleware to handle validation errors
+    .custom((value) => {
+      if (value === "") {
+        return true; // Skip further validation if the password is empty
+      }
+      return value.length >= 8 && value.length <= 64;
+    })
+    .withMessage("Password must be between 8 and 64 characters"),
+  body("repassword").optional().trim().escape(),
+  body("username").optional().trim().escape(),
+  body("firstName").optional().trim().escape(),
+  body("lastName").optional().trim().escape(),
+  body("bio").optional().trim().escape(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -95,23 +119,25 @@ exports.validateUser = [
   },
 ];
 
-// Middleware to validate offer data
-exports.validateOffer = [
-  // Validate the amount field to ensure it is a valid currency value
-  body("amount")
-    .trim()
-    .isCurrency({ allow_negatives: false })
-    .withMessage("Invalid offer amount"),
-
-  // Middleware to handle validation errors
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      let err = new Error("Validation failed");
-      err.status = 400;
-      err.errors = errors.array();
-      return next(err);
-    }
-    next();
+// Configure multer storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../public/uploads/profile-pictures")); // Save files in this directory
   },
-];
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+  },
+});
+
+// File filter to allow only images
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image/")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed"), false);
+  }
+};
+
+// Multer middleware
+exports.uploadProfilePicture = multer({ storage, fileFilter });
+

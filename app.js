@@ -46,12 +46,25 @@ app.use(
 // Middleware for flash messages
 app.use(flash());
 
-// Set global variables for flash messages
-app.use((req, res, next) => {
+const User = require("./models/user");
+
+// Set global variables
+app.use(async (req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
   res.locals.isAuthenticated = req.session.userId ? true : false;
   res.locals.currentPath = req.path;
+  if (req.session.userId) {
+    try {
+      const user = await User.findById(req.session.userId);
+      res.locals.user = user;
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      res.locals.user = null;
+    }
+  } else {
+    res.locals.user = null;
+  }
   next();
 });
 

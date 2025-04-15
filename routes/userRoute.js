@@ -1,8 +1,17 @@
 const express = require("express");
 const controller = require("../controllers/userController");
-const { validateUser, ensureAuthenticated, checkAuthenticated } = require("../middlewares/validator");
+const { validateUser, ensureAuthenticated, checkAuthenticated, uploadProfilePicture } = require("../middlewares/validator");
 
 const router = express.Router();
+
+// Render profile page
+router.get("/profile/:username", ensureAuthenticated, controller.profile);
+
+// Handle modifying users
+router.get("/edit", ensureAuthenticated, (req, res) => {
+  res.render("user/edit");
+});
+router.post("/edit", ensureAuthenticated, uploadProfilePicture.single("profilePicture"), validateUser, controller.edit);
 
 // Render the registration page
 router.get('/register', controller.register);
@@ -23,3 +32,4 @@ router.get('/profile', ensureAuthenticated, controller.profile);
 router.get('/logout', controller.logout);
 
 module.exports = router;
+

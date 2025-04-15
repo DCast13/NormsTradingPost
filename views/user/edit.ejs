@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('../partials/head') %>
+
+  <body>
+    <%- include('../partials/header') %>
+
+    <div class="login-container">
+      <h1>Edit Profile</h1>
+      <form class="login-box" action="/edit" method="POST" enctype="multipart/form-data">
+        <label for="profilePicture">Profile Picture</label>
+        <input type="file" id="profilePicture" name="profilePicture" accept="image/*" />
+
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="<%= user.username %>" placeholder="Enter your username" required />
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="<%= user.email %>" placeholder="Enter your email" required />
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" />
+
+        <label for="repassword">Confirm Password</label>
+        <input type="password" id="repassword" name="repassword" placeholder="Confirm your password" />
+
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" value="<%= user.firstName %>" placeholder="Enter your first name" />
+
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" value="<%= user.lastName %>" placeholder="Enter your last name" />
+
+        <label for="bio">Bio</label>
+        <textarea id="bio" name="bio" placeholder="Tell us about yourself"><%= user.bio %></textarea>
+
+        <button type="submit" class="primary-button">Save Changes</button>
+      </form>
+    </div>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

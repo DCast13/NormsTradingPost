@@ -4,15 +4,21 @@ const bcrypt = require("bcryptjs");
 
 // Define the schema for a user
 const userSchema = new Schema({
-  firstName: { type: String },
-  lastName: { type: String },
+  username: { type: String },
   email: { type: String, required: [true, "email address is required"], unique: [true, "this email address has been used"] },
   password: { type: String, required: [true, "password is required"] },
+  profilePicture: { type: String, default: "/assets/images/default-user.png" },
+  firstName: { type: String },
+  lastName: { type: String },
+  bio: { type: String },
 });
 
 // Middleware to hash the password before saving the user
 userSchema.pre("save", function (next) {
   let user = this;
+  if (!user.username && user.email) {
+    user.username = user.email.split("@")[0];
+  }
   if (!user.isModified("password")) return next();
   bcrypt
     .hash(user.password, 10)
