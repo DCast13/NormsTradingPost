@@ -1,6 +1,13 @@
 const User = require("../models/user");
 const Listing = require("../models/listing");
+const Offer = require("../models/offer");
 
+// Render the registration page
+exports.register = (req, res) => {
+  res.render("user/register", { title: "Register" });
+};
+
+// Create a new user
 exports.create = async (req, res, next) => {
   const { email, password, repassword, firstName, lastName } = req.body;
   let user = new User({ email, password, firstName, lastName });
@@ -10,13 +17,13 @@ exports.create = async (req, res, next) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       req.flash("error_msg", "Email already in use");
-      return res.redirect("/register");
+      return res.redirect("/user/register");
     }
 
     // Ensure password and repassword match
     if (password !== repassword) {
       req.flash("error_msg", "Passwords do not match");
-      return res.redirect("/register");
+      return res.redirect("/user/register");
     }
 
     // Save the new user to the database
@@ -26,43 +33,69 @@ exports.create = async (req, res, next) => {
     res.redirect("/browse");
   } catch (err) {
     req.flash("error_msg", err.message);
-    res.redirect("/register");
+    res.redirect("/user/register");
   }
 };
 
+// Render the login page
+exports.getUserLogin = (req, res) => {
+  res.render("user/login", { title: "Login" });
+};
+
+// Log in a user
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     // Check if email exists in the database
     const user = await User.findOne({ email });
+
+    // If user not found, return an error
     if (!user) {
       req.flash("error_msg", "Invalid email or password");
-      return res.redirect("/login");
+      return res.redirect("/user/login");
     }
 
-    // Check if the password matches the stored hash
+    // Compare the provided password with the stored hashed password
     const isMatch = await user.comparePassword(password);
+
+    // If passwords do not match, return an error
     if (!isMatch) {
       req.flash("error_msg", "Invalid email or password");
-      return res.redirect("/login");
+      return res.redirect("/user/login");
     }
 
-    // Set the user session
+    // Set the user ID in the session and redirect to the listings page
     req.session.userId = user._id;
     req.flash("success_msg", "Logged in successfully");
-    res.redirect("/browse");
+    res.redirect("/listings/browse");
   } catch (err) {
     req.flash("error_msg", err.message);
-    res.redirect("/login");
+    res.redirect("/user/login");
   }
 };
 
+// Render the user's profile page
+exports.profile = (req, res, next) => {
+  let id = req.session.user;
+  Promise.all([
+    model.findById(id), 
+    Listing.find({ seller: id }), 
+    Offer.find({ seller: id }).populate('listing', 'name')
+  ])
+  .then(results => {
+    const [user, listings, offers] = results;
+    res.render('./user/profile', { user, listings, offers });
+  })
+  .catch(err => next(err));
+};
+
+// Log out a user
 exports.logout = async (req, res, next) => {
   req.session.destroy((err) => {
     if (err) {
       return next(err);
     }
-    res.redirect("/login");
+    res.redirect("/user/login");
   });
 };
 
@@ -140,3 +173,4 @@ exports.edit = async (req, res, next) => {
     next(err);
   }
 };
+

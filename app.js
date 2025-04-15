@@ -1,9 +1,15 @@
 const express = require("express");
+const morgan = require("morgan");
+const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const path = require("path");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
+const userRoutes = require("./routes/userRoute");
+const listingsRoutes = require("./routes/listingsRoute");
+
+// Create app
 const app = express();
 
 // Configure app
@@ -62,16 +68,41 @@ app.use(async (req, res, next) => {
   next();
 });
 
-const indexRoutes = require("./routes/indexRoute");
-const userRoutes = require("./routes/userRoute");
-const listingsRoutes = require("./routes/listingsRoute");
-
-app.use("/", indexRoutes);
-app.use("/", userRoutes);
-app.use("/", listingsRoutes);
-
-app.set("views", path.join(__dirname, "views"));
-
-app.locals.basedir = app.get("views/partials");
-
+// Middleware to serve static files
 app.use(express.static(path.join(__dirname, "public")));
+
+// Middleware to parse URL-encoded data
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware for logging HTTP requests
+app.use(morgan("tiny"));
+
+// Middleware to support HTTP verbs such as PUT and DELETE
+app.use(methodOverride("_method"));
+
+// Routes
+app.get("/", (req, res) => {
+  res.render("landing");
+});
+
+app.use("/listings", listingsRoutes);
+
+app.use("/user", userRoutes);
+
+// Middleware for handling 404 errors
+app.use((req, res, next) => {
+  let err = new Error("The server cannot locate " + req.url);
+  err.status = 404;
+  next(err);
+});
+
+// Middleware for handling other errors
+app.use((err, req, res, next) => {
+  console.log(err.stack);
+  if (!err.status) {
+    err.status = 500;
+    err.message = "Internal Server Error";
+  }
+  res.status(err.status);
+  res.render("error", { error: err });
+});

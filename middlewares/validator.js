@@ -3,35 +3,56 @@ const validator = require("validator");
 const multer = require("multer");
 const path = require("path");
 
-exports.alreadyAuthenticated = (req, res, next) => {
+
+// Middleware to check if the user is already authenticated
+// Redirects to the browse page if the user is logged in
+exports.checkAuthenticated = (req, res, next) => {
   if (req.session.userId) {
-    return res.redirect("/browse");
+    return res.redirect("/listings/browse");
   }
   next();
 };
 
+// Middleware to ensure the user is authenticated
+// Redirects to the login page if the user is not logged in
 exports.ensureAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return next();
   } else {
     req.flash("error_msg", "Please log in to view that resource");
-    res.redirect("/login");
+    res.redirect("/user/login");
   }
 };
 
+// Middleware to validate listing data
 exports.validateListing = [
-  body("title")
+  // Validate and sanitize the name field
+  body("name")
     .trim()
     .notEmpty()
-    .withMessage("Title is required")
+    .withMessage("Name is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
-  body("condition").trim().isIn(["New", "Like New", "Very Good", "Good", "Other"]).withMessage("Invalid condition"),
-  body("price").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid price"),
-  body("details")
+
+  // Validate the condition field to ensure it matches allowed values
+  body("condition")
+    .trim()
+    .isIn(["New", "Like New", "Very Good", "Good", "Other"])
+    .withMessage("Invalid condition"),
+
+  // Validate the price field to ensure it is a valid currency value
+  body("price")
+    .trim()
+    .isCurrency({ allow_negatives: false })
+    .withMessage("Invalid price"),
+
+  // Validate and sanitize the description field
+  body("description")
     .trim()
     .notEmpty()
-    .withMessage("Details are required")
+    .withMessage("Description is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
+
+  // Middleware to handle validation errors
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -44,6 +65,7 @@ exports.validateListing = [
   },
 ];
 
+// MIddleware to validate offers
 exports.validateOffer = [
   body("amount").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid offer amount"),
   (req, res, next) => {
@@ -58,7 +80,9 @@ exports.validateOffer = [
   },
 ];
 
+// Middleware to validate user data
 exports.validateUser = [
+  // Validate and normalize the email field
   body("email")
     .trim()
     .normalizeEmail()
@@ -116,3 +140,4 @@ const fileFilter = (req, file, cb) => {
 
 // Multer middleware
 exports.uploadProfilePicture = multer({ storage, fileFilter });
+
