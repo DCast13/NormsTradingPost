@@ -44,6 +44,20 @@ exports.validateListing = [
   },
 ];
 
+exports.validateOffer = [
+  body("amount").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid offer amount"),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      let err = new Error("Validation failed");
+      err.status = 400;
+      err.errors = errors.array();
+      return next(err);
+    }
+    next();
+  },
+];
+
 exports.validateUser = [
   body("email")
     .trim()
@@ -76,20 +90,6 @@ exports.validateUser = [
       const errorMessages = errors.array().map((error) => error.msg);
       req.flash("error_msg", errorMessages.join(" "));
       return res.redirect(req.originalUrl);
-    }
-    next();
-  },
-];
-
-exports.validateOffer = [
-  body("amount").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid offer amount"),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      let err = new Error("Validation failed");
-      err.status = 400;
-      err.errors = errors.array();
-      return next(err);
     }
     next();
   },
