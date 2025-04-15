@@ -1,4 +1,5 @@
 const model = require('../models/listing');
+const Offer = require('../models/offer');
 
 // Get all active listings, optionally filtered by a search query
 exports.getAllListings = (req, res, next) => {
@@ -39,6 +40,7 @@ exports.create = (req, res, next) => {
                 next(err);
             } else {
                 next(err);
+                console.log(listing);
             }
         });
 };
@@ -112,6 +114,45 @@ exports.delete = (req, res, next) => {
                 err.status = 404;
                 next(err);
             }
+        })
+        .catch(err => next(err));
+};
+
+// Create an offer for a specific listing by ID
+exports.createOffer = (req, res, next) => {
+    const listingId = req.params.id;
+    const { amount } = req.body;
+
+    // Validate the offer amount
+    if (!amount || amount <= 0) {
+        const err = new Error("Invalid offer amount");
+        err.status = 400;
+        return next(err);
+    }
+
+    // Create a new offer
+    const offer = new Offer({
+        amount,
+        status: 'Pending',
+        buyer: req.session.userId,
+        listing: listingId
+    });
+
+    // Save the offer to the database
+    offer.save()
+        .then(() => {
+            // Update the listing's totalOffers and highestOffer
+            return model.findByIdAndUpdate(
+                listingId,
+                {
+                    $inc: { totalOffers: 1 },
+                    $max: { highestOffer: amount }
+                },
+                { useFindAndModify: false, new: true }
+            );
+        })
+        .then(() => {
+            res.redirect(`/listings/details/${listingId}`);
         })
         .catch(err => next(err));
 };

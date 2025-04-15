@@ -57,11 +57,11 @@
         <div class="product-grid">
           <% if (listings.length) { %>
             <% listings.forEach(listing => { %>
-              <div class="product-card">
+                <a href="/listings/details/<%= listing.id %>" class="product-card">
                 <img src="<%= listing.image %>" alt="<%= listing.name %>" />
-                <p><a href="/listings/<%= listing.id %>"><%= listing.name %></a></p>
+                <p><%= listing.name %></p>
                 <p class="price">Asking Price: $<%= listing.price %></p>
-              </div>
+                </a>
             <% }) %>
           <% } else { %>
             <p>There are no listings to display.</p>
