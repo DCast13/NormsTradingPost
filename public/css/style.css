@@ -23,7 +23,7 @@ body {
 
 a {
   text-decoration: none;
-  color: var(--black);
+  color: var(--white);
 }
 
 i {
@@ -43,13 +43,11 @@ header {
 
 .alert {
   padding: 15px;
-  position: fixed;
-  bottom: 0;
+  margin-bottom: 20px;
   border: 1px solid transparent;
   border-radius: 4px;
   font-size: 16px;
   line-height: 1.5;
-  transition: opacity 0.5s ease;
 }
 
 .alert-success {
@@ -77,55 +75,13 @@ header {
   height: 50px;
 }
 
-.search-form {
-  display: flex;
-  width: 100%;
-  max-width: 500px;
-  align-items: center;
-  gap: 5px;
-}
-
 .search-bar {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid var(--primary-green);
+  flex-grow: 0.25;
+  margin: 0 20px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
   border-radius: 20px;
   outline: none;
-  font-size: 16px;
-  transition: box-shadow 0.3s ease;
-}
-
-.search-bar:focus {
-  box-shadow: 0 0 5px var(--primary-green);
-}
-
-.search-button {
-  background-color: var(--primary-green);
-  color: var(--white);
-  border: none;
-  padding: 10px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.search-button:hover {
-  background-color: var(--primary-gold);
-}
-
-.search-button i {
-  color: var(--primary-gold);
-  font-size: 18px;
-  transition: color 0.3s ease;
-}
-
-.search-button:hover i {
-  color: var(--primary-green);
-}
-
-.search-button:active {
-  transform: scale(0.95);
 }
 
 .header-icons {
@@ -194,14 +150,12 @@ footer {
   margin: 10px 0 5px;
 }
 
-.login-box input,
-.login-box textarea {
+.login-box input {
   width: 90%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
-  resize: vertical;
 }
 
 .primary-button,
@@ -364,7 +318,6 @@ section .testimonials {
 .products-container {
   flex: 1;
   margin-left: 20px;
-  margin-right: 20px;
 }
 
 .sort-buttons {
@@ -396,16 +349,10 @@ section .testimonials {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   text-align: center;
   aspect-ratio: 1 / 1.5;
-  width: 250px;
-  height: 375px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 .product-card img {
   width: 100%;
-  height: 70%;
   object-fit: cover;
   border-radius: 5px;
 }
@@ -444,9 +391,6 @@ section .testimonials {
 .details-container img {
   margin-right: 10%;
   border-radius: 8px;
-  max-width: 100%;
-  max-height: 400px;
-  object-fit: contain;
 }
 
 .details {
@@ -525,26 +469,6 @@ section .testimonials {
   color: #666;
 }
 
-.button-group {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.button-group button {
-  padding: 10px 15px;
-  border-radius: 5px;
-  border: none;
-  cursor: pointer;
-  background-color: var(--secondary-jasper);
-  color: var(--black);
-}
-
-.button-group button:hover {
-  background-color: var(--primary-gold);
-}
-
 /* DETAILS.EJS END */
 
 .faq {
@@ -592,25 +516,9 @@ section .testimonials {
   font-size: 14px;
 }
 
-.sell-container select {
-  color: grey;
-}
-
-.sell-container select:not(:invalid) {
-  color: black;
-}
-
-.sell-container option {
-  color: black;
-}
-
 .sell-container input,
-.sell-container select,
 .sell-container textarea,
 .sell-container button {
-  display: inline-block;
-  box-sizing: border-box;
-  resize: vertical;
   width: 90%;
   padding: 10px;
   margin-top: 5px;
@@ -635,12 +543,13 @@ section .testimonials {
   grid-column: span 2;
 }
 
-.profile-card img {
+.profile-card img,
+.profile-card i {
   width: 100px;
   height: 100px;
+  font-size: 100px;
   border-radius: 50%;
-  border: 2px solid var(--primary-green);
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .profile-info {

@@ -16,9 +16,9 @@
         </div>
 
         <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
+          <label><input type="checkbox" /> Label 1</label>
+          <label><input type="checkbox" /> Label 2</label>
+          <label><input type="checkbox" /> Label 3</label>
         </div>
 
         <h3>Price</h3>
@@ -32,16 +32,16 @@
 
         <h3>Color</h3>
         <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
+          <label><input type="checkbox" /> Red</label>
+          <label><input type="checkbox" /> Blue</label>
+          <label><input type="checkbox" /> Green</label>
         </div>
 
         <h3>Size</h3>
         <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
+          <label><input type="checkbox" /> Small</label>
+          <label><input type="checkbox" /> Medium</label>
+          <label><input type="checkbox" /> Large</label>
         </div>
       </div>
 
@@ -54,24 +54,30 @@
           <button>Rating</button>
         </div>
 
+        <!-- Product Grid -->
         <div class="product-grid">
-          <% if (listings.length) { %>
-            <% listings.forEach(listing => { %>
-                <a href="/listings/details/<%= listing.id %>" class="product-card">
-                <img src="<%= listing.image %>" alt="<%= listing.name %>" />
-                <p><%= listing.name %></p>
-                <p class="price">Asking Price: $<%= listing.price %></p>
-                </a>
-            <% }) %>
+          <% if (products && products.length > 0) { %>
+            <% products.forEach((product) => { %>
+              <div class="product-card">
+                <img src="/assets/images/blank.png" alt="<%= product.name %>" />
+                <p><a href="/details?id=<%= product.id %>"><%= product.name %></a></p>
+                <p class="price">Asking Price: $<%= product.price %></p>
+                <p class="condition">Condition: <%= product.condition %></p>
+                <p class="description"><%= product.description %></p>
+                <p class="seller">Seller: <%= product.sellerEmail %></p>
+              </div>
+            <% }); %>
           <% } else { %>
-            <p>There are no listings to display.</p>
+            <p>No products available to display.</p>
           <% } %>
         </div>
+        
+        
+        
+        
       </div>
     </div>
 
     <%- include('../partials/footer') %>
   </body>
 </html>
-
-<!-- This is a test-->

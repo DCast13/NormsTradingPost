@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const offerSchema = new Schema({
     amount: {type: Number, required: [true, 'Amount is required'], min: 0.01},
     status: {type: String, required: true, enum: ['Pending', 'Accepted', 'Rejected']},
-    buyer: {type: Schema.Types.ObjectId, ref: 'User'},
+    seller: {type: Schema.Types.ObjectId, ref: 'User'},
     listing: {type: Schema.Types.ObjectId, ref: 'Listing'}
 },
 {timestamps: true} // Automatically add createdAt and updatedAt timestamps

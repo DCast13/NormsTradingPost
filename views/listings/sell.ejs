@@ -1,35 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <%- include('../partials/head') %>
-
+  <head>
+    <%- include('../partials/head') %>
+    <link rel="stylesheet" href="/css/sell.css" />
+    <title>Sell Item</title>
+  </head>
   <body>
     <%- include('../partials/header') %>
 
     <div class="sell-container">
-      <h1>Sell Item</h1>
+      <h1>Sell an Item</h1>
+      <h2>Provide the details below to list your item for sale.</h2>
       <div class="form-container">
-        <form action="/listings" method="POST" enctype="multipart/form-data">
+        <form action="/sell-item" method="POST">
           <label for="name">Name of Item</label>
-          <input type="text" id="name" name="name" placeholder="Bicycle" required />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Enter item name"
+            required
+          />
 
           <label for="condition">Condition</label>
-          <select id="condition" name="condition" required>
-            <option value="" disabled selected hidden>Select Condition</option>
-            <option value="New">New</option>
-            <option value="Like New">Like New</option>
-            <option value="Very Good">Very Good</option>
-            <option value="Good">Good</option>
-            <option value="Other">Other</option>
-          </select>
+          <input
+            type="text"
+            id="condition"
+            name="condition"
+            placeholder="e.g., New, Used, Like New"
+            required
+          />
 
           <label for="price">Price</label>
-          <input type="number" id="price" name="price" placeholder="119.99" step="0.01" required />
+          <input
+            type="text"
+            id="price"
+            name="price"
+            placeholder="Enter price in USD"
+            required
+          />
 
           <label for="image">Image</label>
           <input type="file" id="image" name="image" required />
 
           <label for="description">Description</label>
-          <textarea id="description" name="description" placeholder="Specialized brand, 10 speed road bike." required minlength="10"></textarea>
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Provide a detailed description"
+            rows="5"
+            required
+          ></textarea>
 
           <button type="submit" class="primary-button">Submit</button>
         </form>

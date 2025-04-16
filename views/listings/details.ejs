@@ -6,31 +6,81 @@
     <%- include('../partials/header') %>
 
     <div class="details-container">
-      <img src="<%= listing.image %>" alt="<%=listing.name%>" />
+      <!-- Display the product image -->
+      <img src="/assets/images/blank.png" alt="<%= product.name %>" />
+      
       <div class="details">
-        <h2><%=listing.name%></h2>
-        <h3><%=listing.price%></h3>
-        <p><%=listing.description%></p>
-
-        <% if (user == listing.seller._id) { %>
-          <form>
-            <div class="button-group">
-              <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
-            
-              <button type="submit" formmethod="POST" 
-              formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
-            </div>
-          </form>
-        <% } else if (listing.active) { %>
-          <form action="/listings/offers/<%= listing.id %>" method="POST">
-              <label for="amount">Offer Amount:</label>
-              <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
-              <button type="submit">Make Offer</button>
-          </form>
-      <% } %>
+        <!-- Display product name -->
+        <h2><%= product.name %></h2>
+        
+        <!-- Display product condition as a tag -->
+        <span class="tag">Condition: <%= product.condition %></span>
+        
+        <!-- Display product price -->
+        <h3>Asking Price: $<%= product.price %></h3>
+        
+        <!-- Display product description -->
+        <p><%= product.description %></p>
+        
+        <div>
+          <div class="dropdown">
+            <label>Label</label>
+            <select>
+              <option>Value 1</option>
+              <option>Value 2</option>
+              <option>Value 3</option>
+            </select>
+          </div>
+          <div class="dropdown">
+            <label>Label</label>
+            <select>
+              <option>Value 1</option>
+              <option>Value 2</option>
+              <option>Value 3</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Add button for user action -->
+        <button>Button</button>
+        
+        <!-- Add a message icon for redirection -->
+        <!-- <img src="/assets/images/meessage.png" alt="Product" onclick="window.location.href='/inbox'" style="cursor: pointer;" /> -->
+        <img 
+        src="/assets/images/meessage.png" 
+        alt="Message Icon" 
+        onclick="redirectToInbox('<%= product.name %>', '<%= product.condition %>', '<%= product.price %>', '<%= product.description %>', '<%= product.sellerEmail %>')"
+        style="cursor: pointer;" 
+      />
+        <!-- Add FAQ section with seller information -->
+        <div class="faq">
+          <strong>Seller Information</strong>
+          <p>Seller: <%= product.sellerEmail %></p>
+          
+          <strong>Title</strong>
+          <p>Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.</p>
+        </div>
       </div>
     </div>
 
     <%- include('../partials/footer') %>
+    <script>
+      function redirectToInbox(name, condition, price, description, sellerEmail) {
+        // Encode the data for the query string
+        const params = new URLSearchParams({
+          name,
+          condition,
+          price,
+          description,
+          sellerEmail,
+        });
+        // Redirect to the inbox page with the query string
+        window.location.href = `/inbox?${params.toString()}`;
+      }
+    </script>
+    
   </body>
+  
+
+
 </html>
