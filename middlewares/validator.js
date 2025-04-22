@@ -2,7 +2,9 @@ const { body, validationResult } = require("express-validator");
 const validator = require("validator");
 const multer = require("multer");
 const path = require("path");
-
+const fs = require("fs");
+const { promisify } = require("util");
+const unlinkAsync = promisify(fs.unlink);
 
 // Middleware to check if the user is already authenticated
 // Redirects to the browse page if the user is logged in
@@ -20,7 +22,7 @@ exports.ensureAuthenticated = (req, res, next) => {
     return next();
   } else {
     req.flash("error_msg", "Please log in to view that resource");
-    res.redirect("/user/login");
+    res.redirect("/login");
   }
 };
 
@@ -34,16 +36,10 @@ exports.validateListing = [
     .customSanitizer((value) => validator.stripLow(value, true)),
 
   // Validate the condition field to ensure it matches allowed values
-  body("condition")
-    .trim()
-    .isIn(["New", "Like New", "Very Good", "Good", "Other"])
-    .withMessage("Invalid condition"),
+  body("condition").trim().isIn(["New", "Like New", "Very Good", "Good", "Other"]).withMessage("Invalid condition"),
 
   // Validate the price field to ensure it is a valid currency value
-  body("price")
-    .trim()
-    .isCurrency({ allow_negatives: false })
-    .withMessage("Invalid price"),
+  body("price").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid price"),
 
   // Validate and sanitize the description field
   body("description")
@@ -56,10 +52,16 @@ exports.validateListing = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      let err = new Error("Validation failed");
-      err.status = 400;
-      err.errors = errors.array();
-      return next(err);
+      const errorMessages = errors.array().map((error) => error.msg);
+      const trimmedPath = req.originalUrl.split("/").pop();
+      return res.render(`listings/details/${trimmedPath}`, {
+        title: "Listing Details",
+        error_msg: errorMessages.join("\n"),
+        name: req.body.name,
+        condition: req.body.condition,
+        price: req.body.price,
+        description: req.body.description,
+      });
     }
     next();
   },
@@ -71,10 +73,13 @@ exports.validateOffer = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      let err = new Error("Validation failed");
-      err.status = 400;
-      err.errors = errors.array();
-      return next(err);
+      const errorMessages = errors.array().map((error) => error.msg);
+      const trimmedPath = req.originalUrl.split("/").pop();
+      return res.render(`listings/details/${trimmedPath}`, {
+        title: "Listing Details",
+        error_msg: errorMessages.join("\n"),
+        amount: req.body.amount,
+      });
     }
     next();
   },
@@ -84,6 +89,7 @@ exports.validateOffer = [
 exports.validateUser = [
   // Validate and normalize the email field
   body("email")
+    .optional()
     .trim()
     .normalizeEmail()
     .isEmail()
@@ -95,34 +101,81 @@ exports.validateUser = [
       return true;
     }),
   body("password")
+    .optional()
     .trim()
-    .custom((value) => {
+    .custom((value, { req }) => {
       if (value === "") {
-        return true; // Skip further validation if the password is empty
+        delete req.body.password; // Remove the password field from body if it's empty
+        return true;
       }
-      return value.length >= 8 && value.length <= 64;
-    })
-    .withMessage("Password must be between 8 and 64 characters"),
-  body("repassword").optional().trim().escape(),
-  body("username").optional().trim().escape(),
+      if (value.length < 8 || value.length > 64) {
+        throw new Error("Password must be between 8 and 64 characters");
+      }
+      if (req.body.repassword && value !== req.body.repassword) {
+        throw new Error("Passwords do not match");
+      }
+      return true;
+    }),
+  body("repassword")
+    .optional()
+    .trim()
+    .custom((value, { req }) => {
+      if (value === "") {
+        delete req.body.repassword; // Remove the repassword field from body if it's empty
+        return true;
+      }
+      if (req.body.password && value !== req.body.password) {
+        throw new Error("Passwords do not match");
+      }
+      return true;
+    }),
+  body("username")
+    .optional()
+    .trim()
+    .escape()
+    .customSanitizer((value) => validator.stripLow(value, true))
+    .isLength({ min: 3, max: 30 })
+    .withMessage("Username must be between 3 and 30 characters")
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage("Username can only contain letters, numbers, and underscores"),
   body("firstName").optional().trim().escape(),
   body("lastName").optional().trim().escape(),
-  body("bio").optional().trim().escape(),
+  body("bio")
+    .optional()
+    .trim()
+    .escape()
+    .customSanitizer((value) => validator.stripLow(value, true)),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((error) => error.msg);
-      req.flash("error_msg", errorMessages.join(" "));
-      return res.redirect(req.originalUrl);
+      const trimmedPath = req.originalUrl.split("/").pop();
+      return res.render(`user/${trimmedPath}`, {
+        title: trimmedPath.charAt(0).toUpperCase() + trimmedPath.slice(1),
+        error_msg: errorMessages.join("\n"),
+        email: req.body.email,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        bio: req.body.bio,
+      });
     }
     next();
   },
 ];
 
 // Configure multer storage
-const storage = multer.diskStorage({
+const profileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../public/uploads/profile-pictures")); // Save files in this directory
+    cb(null, path.join(__dirname, "../public/uploads/profiles"));
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
+  },
+});
+
+const listingStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "../public/uploads/listings"));
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Unique filename
@@ -134,10 +187,23 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(new Error("Only image files are allowed"), false);
+    cb(new Error("Invalid file type. Only images are allowed."));
   }
 };
 
 // Multer middleware
-exports.uploadProfilePicture = multer({ storage, fileFilter });
+exports.uploadProfilePicture = multer({ storage: profileStorage, fileFilter });
+exports.uploadListingPicture = multer({ storage: listingStorage, fileFilter });
 
+// Utility function to delete a file
+exports.deleteFile = async (filePath) => {
+  try {
+    console.log(`Deleting file: ${filePath}`);
+    const oldImagePath = path.join(__dirname, "../public", filePath);
+    await unlinkAsync(oldImagePath);
+    console.log(`File deleted: ${oldImagePath}`);
+  } catch (err) {
+    console.error(`Error deleting file: ${oldImagePath}`, err);
+    throw err;
+  }
+};

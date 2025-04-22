@@ -52,18 +52,16 @@ const User = require("./models/user");
 app.use(async (req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
-  res.locals.isAuthenticated = req.session.userId ? true : false;
   res.locals.currentPath = req.path;
   if (req.session.userId) {
     try {
-      const user = await User.findById(req.session.userId);
-      res.locals.user = user;
+      res.locals.globalUser = await User.findById(req.session.userId);
     } catch (err) {
       console.error("Error fetching user:", err);
-      res.locals.user = null;
+      res.locals.globalUser = null;
     }
   } else {
-    res.locals.user = null;
+    res.locals.globalUser = null;
   }
   next();
 });
@@ -87,7 +85,7 @@ app.get("/", (req, res) => {
 
 app.use("/listings", listingsRoutes);
 
-app.use("/user", userRoutes);
+app.use("/", userRoutes);
 
 // Middleware for handling 404 errors
 app.use((req, res, next) => {

@@ -23,7 +23,7 @@ body {
 
 a {
   text-decoration: none;
-  color: var(--white);
+  color: var(--black);
 }
 
 i {
@@ -137,9 +137,12 @@ header {
   margin-left: 15px;
 }
 
-.header-icons .icon img {
-  width: 30px;
-  height: 30px;
+.header-icons img {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-green);
+  object-fit: scale-down;
 }
 
 .header-icons .profile-pic {
@@ -363,8 +366,7 @@ section .testimonials {
 
 .products-container {
   flex: 1;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin: 0 20px;
 }
 
 .sort-buttons {
@@ -393,6 +395,7 @@ section .testimonials {
 .product-card {
   padding: 15px;
   border-radius: 8px;
+  border: var(--primary-green) 2px solid;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   text-align: center;
   aspect-ratio: 1 / 1.5;
@@ -408,6 +411,7 @@ section .testimonials {
   height: 70%;
   object-fit: cover;
   border-radius: 5px;
+  border: 1px solid var(--primary-green);
 }
 
 .product-card p {
@@ -527,6 +531,8 @@ section .testimonials {
 
 .button-group {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
   justify-content: center;
   margin-top: 20px;
@@ -620,18 +626,14 @@ section .testimonials {
 
 /* PROFILE */
 .profile-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
   width: 100%;
 }
 
 .profile-card {
   background: white;
   padding: 20px;
-  border-radius: 10px;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   grid-column: span 2;
 }
 

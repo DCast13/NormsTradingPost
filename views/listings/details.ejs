@@ -13,17 +13,16 @@
         <h3><%=listing.price%></h3>
         <p><%=listing.description%></p>
 
-        <% if (user == listing.seller._id) { %>
-          <form>
-            <div class="button-group">
-              <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
-            
-              <button type="submit" formmethod="POST" 
-              formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
-            </div>
-          </form>
+        <% if (globalUser._id.toString() == listing.seller._id.toString()) { %>
+        <form>
+          <div class="button-group">
+            <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
+
+            <button type="submit" formmethod="POST" formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
+          </div>
+        </form>
         <% } %>
-        
+
         <div class="faq">
           <strong>Title</strong>
           <p>Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.</p>
