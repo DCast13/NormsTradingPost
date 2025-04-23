@@ -9,7 +9,6 @@
       <img src="<%= listing.image %>" alt="<%=listing.name%>" />
       <div class="details">
         <h2><%=listing.name%></h2>
-        <span class="tag">Tag</span>
         <h3><%=listing.price%></h3>
         <p><%=listing.description%></p>
 
@@ -21,12 +20,13 @@
             <button type="submit" formmethod="POST" formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
           </div>
         </form>
-        <% } %>
-
-        <div class="faq">
-          <strong>Title</strong>
-          <p>Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.</p>
-        </div>
+        <% } else if (listing.active) { %>
+          <form action="/listings/offers/<%= listing.id %>" method="POST">
+              <label for="amount">Offer Amount:</label>
+              <input type="number" id="amount" name="amount" step="0.01" min="0.01" required>
+              <button type="submit">Make Offer</button>
+          </form>
+      <% } %>
       </div>
     </div>
 

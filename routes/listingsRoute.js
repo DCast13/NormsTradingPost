@@ -24,4 +24,7 @@ router.put("/:id", ensureAuthenticated, uploadListingPicture.single("image"), va
 // Delete a listing
 router.delete("/:id", ensureAuthenticated, controller.delete);
 
+// Create an offer for a listing
+router.post("/offers/:id", ensureAuthenticated, controller.createOffer);
+
 module.exports = router;
