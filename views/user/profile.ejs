@@ -29,15 +29,17 @@
       <% if(listings.length == 0) { %>
       <h1>No listings posted.</h1>
       <% } else { %>
-      <h1>Listings</h1>
-      <div class="product-grid">
-        <% listings.forEach(listing => { %>
-        <div class="product-card">
-          <img src="<%= listing.image %>" alt="<%= listing.title %>" />
-          <p><a href="/listings/<%= listing._id %>"><%= listing.title %></a></p>
-          <p class="price">Asking Price: $<%= listing.price.toFixed(2) %></p>
+      <div class="products-container">
+        <h1>Listings</h1>
+        <div class="product-grid">
+          <% listings.forEach(listing => { %>
+          <a href="/listings/details/<%= listing.id %>" class="product-card">
+            <img src="<%= listing.image %>" alt="<%= listing.name %>" />
+            <p><%= listing.name %></p>
+            <p class="price">Asking Price: $<%= listing.price %></p>
+          </a>
+          <% }) %>
         </div>
-        <% }) %>
       </div>
       <% } %>
     </div>
