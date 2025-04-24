@@ -48,23 +48,21 @@
       <!-- Product Listing -->
       <div class="products-container">
         <div class="sort-buttons">
-          <a href="/listings?sort=new" class="<%= sort === 'new' ? 'active' : '' %>">New</a>
-          <a href="/listings?sort=priceAsc" class="<%= sort === 'priceAsc' ? 'active' : '' %>">Price ascending</a>
-          <a href="/listings?sort=priceDesc" class="<%= sort === 'priceDesc' ? 'active' : '' %>">Price descending</a>
-          <a href="/listings?sort=rating" class="<%= sort === 'rating' ? 'active' : '' %>">Rating</a>
+          <a href="?sort=new<%= search ? `&search=${encodeURIComponent(search)}` : '' %>" class="<%= sort === 'new' ? 'active' : '' %>">Newest</a>
+          <a href="?sort=old<%= search ? `&search=${encodeURIComponent(search)}` : '' %>" class="<%= sort === 'old' ? 'active' : '' %>">Oldest</a>
+          <a href="?sort=priceAsc<%= search ? `&search=${encodeURIComponent(search)}` : '' %>" class="<%= sort === 'priceAsc' ? 'active' : '' %>">Price Ascending</a>
+          <a href="?sort=priceDesc<%= search ? `&search=${encodeURIComponent(search)}` : '' %>" class="<%= sort === 'priceDesc' ? 'active' : '' %>">Price Descending</a>
         </div>
 
         <div class="product-grid">
-          <% if (listings.length) { %>
-            <% listings.forEach(listing => { %>
-              <div class="product-card">
-                <img src="<%= listing.image %>" alt="<%= listing.name %>" />
-                <p><a href="/listings/<%= listing.id %>"><%= listing.name %></a></p>
-                <p class="price">Asking Price: $<%= listing.price %></p>
-              </div>
-            <% }) %>
-          <% } else { %>
-            <p>There are no listings to display.</p>
+          <% if (listings.length) { %> <% listings.forEach(listing => { %>
+          <div class="product-card">
+            <img src="<%= listing.image %>" alt="<%= listing.name %>" />
+            <p><a href="/listings/details/<%= listing.id %>"><%= listing.name %></a></p>
+            <p class="price">Asking Price: $<%= listing.price %></p>
+          </div>
+          <% }) %> <% } else { %>
+          <p>There are no listings to display.</p>
           <% } %>
         </div>
       </div>
@@ -73,5 +71,3 @@
     <%- include('../partials/footer') %>
   </body>
 </html>
-
-<!-- This is a test-->

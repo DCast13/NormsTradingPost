@@ -8,7 +8,10 @@
       <img src="/assets/images/NORM.png" alt="Logo" />
     </a>
     <form action="/listings/browse" method="GET" class="search-form">
-      <input type="text" class="search-bar" name="search" placeholder="Search..." />
+      <input type="text" class="search-bar" name="search" placeholder="Search..." value="<%= typeof search !== 'undefined' ? search : '' %>" />
+      <% if (sort) { %>
+        <input type="hidden" name="sort" value="<%= sort %>" />
+      <% } %>
       <button type="submit" class="search-button">
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
