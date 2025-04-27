@@ -1,5 +1,5 @@
 const model = require("../models/listing");
-const Offer = require('../models/offer');
+const Offer = require("../models/offer");
 const { deleteFile } = require("../middlewares/validator");
 const { title } = require("process");
 
@@ -71,13 +71,20 @@ exports.edit = (req, res, next) => {
   model
     .findById(id)
     .then((listing) => {
-      if (listing) {
-        res.render("./listings/edit", { title: "Edit Listing", listing });
-      } else {
+      if (!listing) {
         let err = new Error("Cannot find a listing with id: " + id);
         err.status = 404;
-        next(err);
+        return next(err);
       }
+
+      // Check if the logged-in user is the owner of the listing
+      if (listing.seller.toString() !== req.session.userId) {
+        let err = new Error("Unauthorized: You are not the owner of this listing.");
+        err.status = 403;
+        return next(err);
+      }
+
+      res.render("./listings/edit", { title: "Edit Listing", listing });
     })
     .catch((err) => next(err));
 };
@@ -141,39 +148,40 @@ exports.delete = (req, res, next) => {
 
 // Create an offer for a specific listing by ID
 exports.createOffer = (req, res, next) => {
-    const listingId = req.params.id;
-    const { amount } = req.body;
+  const listingId = req.params.id;
+  const { amount } = req.body;
 
-    // Validate the offer amount
-    if (!amount || amount <= 0) {
-        const err = new Error("Invalid offer amount");
-        err.status = 400;
-        return next(err);
-    }
+  // Validate the offer amount
+  if (!amount || amount <= 0) {
+    const err = new Error("Invalid offer amount");
+    err.status = 400;
+    return next(err);
+  }
 
-    // Create a new offer
-    const offer = new Offer({
-        amount,
-        status: 'Pending',
-        buyer: req.session.userId,
-        listing: listingId
-    });
+  // Create a new offer
+  const offer = new Offer({
+    amount,
+    status: "Pending",
+    buyer: req.session.userId,
+    listing: listingId,
+  });
 
-    // Save the offer to the database
-    offer.save()
-        .then(() => {
-            // Update the listing's totalOffers and highestOffer
-            return model.findByIdAndUpdate(
-                listingId,
-                {
-                    $inc: { totalOffers: 1 },
-                    $max: { highestOffer: amount }
-                },
-                { useFindAndModify: false, new: true }
-            );
-        })
-        .then(() => {
-            res.redirect(`/listings/details/${listingId}`);
-        })
-        .catch(err => next(err));
+  // Save the offer to the database
+  offer
+    .save()
+    .then(() => {
+      // Update the listing's totalOffers and highestOffer
+      return model.findByIdAndUpdate(
+        listingId,
+        {
+          $inc: { totalOffers: 1 },
+          $max: { highestOffer: amount },
+        },
+        { useFindAndModify: false, new: true }
+      );
+    })
+    .then(() => {
+      res.redirect(`/listings/details/${listingId}`);
+    })
+    .catch((err) => next(err));
 };

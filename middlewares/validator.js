@@ -49,14 +49,24 @@ exports.validateListing = [
     .customSanitizer((value) => validator.stripLow(value, true)),
 
   // Middleware to handle validation errors
+  // TODO: Render URLs are wrong because of the ?_method=PUT query string
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       const errorMessages = errors.array().map((error) => error.msg);
-      const trimmedPath = req.originalUrl.split("/").pop();
-      return res.render(`listings/details/${trimmedPath}`, {
+      return res.render(`listings/details/${req.originalUrl.split("/").pop()}`, {
         title: "Listing Details",
         error_msg: errorMessages.join("\n"),
+        name: req.body.name,
+        condition: req.body.condition,
+        price: req.body.price,
+        description: req.body.description,
+      });
+    }
+    if (req.fileValidationError) {
+      return res.render(`listings/details/${req.originalUrl.split("/").pop()}`, {
+        title: "Listing",
+        error_msg: req.fileValidationError,
         name: req.body.name,
         condition: req.body.condition,
         price: req.body.price,
@@ -67,7 +77,7 @@ exports.validateListing = [
   },
 ];
 
-// MIddleware to validate offers
+// Middleware to validate offers
 exports.validateOffer = [
   body("amount").trim().isCurrency({ allow_negatives: false }).withMessage("Invalid offer amount"),
   (req, res, next) => {
@@ -111,9 +121,6 @@ exports.validateUser = [
       if (value.length < 8 || value.length > 64) {
         throw new Error("Password must be between 8 and 64 characters");
       }
-      if (req.body.repassword && value !== req.body.repassword) {
-        throw new Error("Passwords do not match");
-      }
       return true;
     }),
   body("repassword")
@@ -154,6 +161,17 @@ exports.validateUser = [
         title: trimmedPath.charAt(0).toUpperCase() + trimmedPath.slice(1),
         error_msg: errorMessages.join("\n"),
         email: req.body.email,
+        username: req.body.username,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        bio: req.body.bio,
+      });
+    }
+    if (req.fileValidationError) {
+      return res.render("user/edit", {
+        title: "Edit Profile",
+        error_msg: req.fileValidationError,
+        username: req.body.username,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         bio: req.body.bio,
@@ -187,7 +205,8 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only images are allowed."));
+    req.fileValidationError = "Invalid file type. Only images are allowed.";
+    cb(null, false); // Reject the file
   }
 };
 
@@ -198,12 +217,9 @@ exports.uploadListingPicture = multer({ storage: listingStorage, fileFilter });
 // Utility function to delete a file
 exports.deleteFile = async (filePath) => {
   try {
-    console.log(`Deleting file: ${filePath}`);
     const oldImagePath = path.join(__dirname, "../public", filePath);
     await unlinkAsync(oldImagePath);
-    console.log(`File deleted: ${oldImagePath}`);
   } catch (err) {
-    console.error(`Error deleting file: ${oldImagePath}`, err);
     throw err;
   }
 };
