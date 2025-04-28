@@ -38,8 +38,8 @@
         <ul>
           <% offers.forEach(offer => { %>
             <li>
-              <strong>Buyer:</strong> <%= offer.buyer.username %> |
-              <strong>Amount:</strong> $<%= offer.amount %> |
+              <strong>Buyer:</strong> <%= offer.buyer.username %>
+              <strong>Amount:</strong> $<%= offer.amount %>
               <strong>Status:</strong> <%= offer.status %>
               <% if (offer.status === 'Pending' && listing.active) { %>
                 <form action="/listings/offers/<%= offer._id %>/accept" method="POST" style="display:inline;">
