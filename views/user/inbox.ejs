@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/head') %>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inbox</title>
+    <link rel="stylesheet" href="/styles/inbox.css">
+    <%- include('partials/header') %>
+    <style>
+    /* Inline styles for the inbox */
+    .inbox-container {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .conversations {
+      flex: 1;
+      border-right: 1px solid #ddd;
+      padding: 1rem;
+    }
+
+    .conversation-item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+
+    .conversation-item:hover {
+      background: #f0f0f0;
+    }
+
+    .messages {
+      flex: 2;
+      padding: 1rem;
+    }
+
+    .message {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+    }
+
+    .message-form {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Inbox</h1>
+  </header>
+  <main>
+    
+    <div class="inbox-container">
+      <!-- Left Sidebar: List of Conversations -->
+      <aside class="conversations">
+        <h2>Conversations</h2>
+        <ul>
+          <% Object.keys(messages).forEach(email => { %>
+            <li>
+              <button 
+                class="conversation-item" 
+                onclick="loadMessages('<%= email %>')">
+                <strong><%= email.replace(/_/g, '.') %></strong>
+              </button>
+            </li>
+          <% }) %>
+        </ul>
+      </aside>
+
+      <!-- Right Content: Messages for Selected Email -->
+      <section class="messages">
+        <h2 id="messages-title">Messages</h2>
+        <div id="messages-content">
+          <p>Select a conversation to view messages.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Message Form -->
+    <section class="message-form">
+      <h2>Send a Message</h2>
+      <form action="/send-message" method="POST" onsubmit="handleFormSubmit(event)">
+        <div>
+          <label for="recipient">Recipient:</label>
+          <p id="recipient-display"><strong>Seller:</strong> ${sellerEmail}</p>
+  <input type="hidden" id="recipient" name="recipient" required>
+        </div>
+        <div>
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+        <button type="submit">Send</button>
+      </form>
+    </section>
+    <section id="product-details">
+      <!-- Product details will be inserted here -->
+    </section>
+    
+  </main>
+  <script>
+    // Fetch and display messages for a specific conversation
+    async function loadMessages(email) {
+      try {
+        console.log("Fetching messages for:", email); // Log the email being queried
+  
+        // Fetch the messages from the backend
+        const response = await fetch(`/messages/${email}`);
+        console.log("Response status:", response.status); // Log the response status
+  
+        if (!response.ok) {
+          throw new Error(`Failed to fetch messages: ${response.statusText}`);
+        }
+  
+        // Parse the JSON data
+        const filteredMessages = await response.json();
+        console.log("Fetched messages:", filteredMessages); // Log the fetched data
+  
+        // Check if there are no messages
+        if (!filteredMessages || filteredMessages.length === 0) {
+          console.warn("No messages found for:", email); // Warn about no messages
+          document.getElementById("messages-content").innerHTML = `
+            <p>No messages found for this conversation.</p>
+          `;
+          document.getElementById("messages-title").textContent = `Messages for ${email.replace(/_/g, ".")}`;
+          return;
+        }
+  
+        // Display the messages
+      
+        const formattedMessages = filteredMessages.map(msg => `
+  <div class="message">
+    <p><strong>${msg.sender ? msg.sender.replace(/_/g, ".") : "Unknown Sender"}:</strong> ${msg.message || "No message content"}</p>
+    <small>${msg.timestamp ? new Date(msg.timestamp).toLocaleString() : "Unknown time"}</small>
+  </div>
+`).join("");
+
+
+  
+        document.getElementById("messages-content").innerHTML = formattedMessages;
+        document.getElementById("messages-title").textContent = `Messages for ${email.replace(/_/g, ".")}`;
+      } catch (error) {
+        console.error("Error loading messages:", error);
+  
+        // Display a user-friendly error message
+        document.getElementById("messages-content").innerHTML = `
+          <p>Failed to load messages. Error: ${error.message}</p>
+        `;
+      }
+    }
+    // Function to extract query parameters
+  function getQueryParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      name: params.get('name'),
+      condition: params.get('condition'),
+      price: params.get('price'),
+      description: params.get('description'),
+      sellerEmail: params.get('sellerEmail'),
+    };
+  }
+
+  // Display the product details in the inbox
+  function displayProductDetails() {
+    const { name, condition, price, description, sellerEmail } = getQueryParams();
+
+    if (name && condition && price && description && sellerEmail) {
+      document.getElementById('product-details').innerHTML = `
+        <div>
+          <h2>${name}</h2>
+          <p><strong>Condition:</strong> ${condition}</p>
+          <p><strong>Asking Price:</strong> $${price}</p>
+          <p><strong>Description:</strong> ${description}</p>
+          <p><strong>Seller:</strong> ${sellerEmail}</p>
+        </div>
+      `;
+      
+    // Display seller email in the visible <p> element
+    document.getElementById('recipient-display').innerHTML = `<strong>Seller:</strong> ${sellerEmail}`;
+    
+    // Assign the seller email to the hidden input for form submission
+    document.getElementById('recipient').value = sellerEmail;
+    }
+  }
+ // Handle form submission
+ function handleFormSubmit(event) {
+      event.preventDefault();
+      alert("Message sent successfully!");
+     
+      event.target.submit(); // This submits the form to the backend
+   
+
+      return false;
+    }
+
+  // Run the function on page load
+  window.onload = displayProductDetails;
+  </script>
+  
+  <%- include('partials/footer') %>
+  </body>
+</html>
