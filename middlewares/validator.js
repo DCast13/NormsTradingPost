@@ -218,7 +218,11 @@ exports.uploadListingPicture = multer({ storage: listingStorage, fileFilter });
 exports.deleteFile = async (filePath) => {
   try {
     const oldImagePath = path.join(__dirname, "../public", filePath);
-    await unlinkAsync(oldImagePath);
+    if (fs.existsSync(oldImagePath)) {
+      await unlinkAsync(oldImagePath);
+    } else {
+      console.warn(`File not found: ${oldImagePath}`);
+    }
   } catch (err) {
     throw err;
   }
