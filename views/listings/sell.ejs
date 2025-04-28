@@ -8,28 +8,27 @@
     <div class="sell-container">
       <h1>Sell Item</h1>
       <div class="form-container">
-        <form action="/listings" method="POST" enctype="multipart/form-data">
+        <form action="/listings/<%= listing.id %>?_method=PUT" method="POST" enctype="multipart/form-data">
           <label for="name">Name of Item</label>
-          <input type="text" id="name" name="name" placeholder="Bicycle" required />
+          <input type="text" id="name" name="name" value="<%= listing.name %>" required />
 
           <label for="condition">Condition</label>
           <select id="condition" name="condition" required>
-            <option value="" disabled selected hidden>Select Condition</option>
-            <option value="New">New</option>
-            <option value="Like New">Like New</option>
-            <option value="Very Good">Very Good</option>
-            <option value="Good">Good</option>
-            <option value="Other">Other</option>
+            <option value="New" <%= listing && listing.condition === 'New' ? 'selected' : '' %>>New</option>
+            <option value="Like New" <%= listing && listing.condition === 'Like New' ? 'selected' : '' %>>Like New</option>
+            <option value="Very Good" <%= listing && listing.condition === 'Very Good' ? 'selected' : '' %>>Very Good</option>
+            <option value="Good" <%= listing && listing.condition === 'Good' ? 'selected' : '' %>>Good</option>
+            <option value="Other" <%= listing && listing.condition === 'Other' ? 'selected' : '' %>>Other</option>
           </select>
 
           <label for="price">Price</label>
-          <input type="number" id="price" name="price" placeholder="119.99" step="0.01" required />
+          <input type="number" id="price" name="price" value="<%= listing.price %>" step="0.01" required />
 
           <label for="image">Image</label>
-          <input type="file" id="image" name="image" accept="image/*" required />
+          <input type="file" id="image" name="image" accept="image/*" />
 
           <label for="description">Description</label>
-          <textarea id="description" name="description" placeholder="Specialized brand, 10 speed road bike." required minlength="10"></textarea>
+          <textarea id="description" name="description" required minlength="10"><%= listing.description %></textarea>
 
           <button type="submit" class="primary-button">Submit</button>
         </form>

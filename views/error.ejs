@@ -1,8 +1,22 @@
-<%- include('partials/head.ejs') %> <%- include('partials/header.ejs') %>
-<main>
-  <div class="content">
-    <h3><%= error.status%></h3>
-    <p><%= error.message%></p>
-  </div>
-</main>
-<%- include('partials/footer.ejs') %>
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/head') %>
+
+  <body>
+    <!-- Section -->
+    <section class="landing-section">
+      <h1>Norm's Trading Post</h1>
+      <p>The place where anyone can find gold.</p>
+      <div class="button-group">
+        <a href="/login" class="primary-button">Sign In</a>
+        <a href="/register" class="secondary-button">Register</a>
+      </div>
+    </section>
+
+    <!-- Image -->
+    <img src="./assets/images/UNCC.png" alt="UNCC Campus" class="banner-image" />
+
+    <!-- Footer -->
+    <%- include('partials/footer') %>
+  </body>
+</html>
