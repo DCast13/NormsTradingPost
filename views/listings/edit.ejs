@@ -5,26 +5,33 @@
   <body>
     <%- include('../partials/header') %>
 
-    <div class="container">
-      <div class="image-placeholder">Image</div>
-      <div class="details">
-        <h2>Text Heading</h2>
-        <span class="tag">Tag</span>
-        <div class="price">$50</div>
-        <p>Text</p>
-        <label>Label</label>
-        <select>
-          <option>Value</option>
-        </select>
-        <label>Label</label>
-        <select>
-          <option>Value</option>
-        </select>
-        <button>Button</button>
-        <div class="faq">
-          <strong>Title</strong>
-          <p>Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.</p>
-        </div>
+    <div class="sell-container">
+      <h1>Sell Item</h1>
+      <div class="form-container">
+        <form action="/listings/<%= listing.id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+          <label for="name">Name of Item</label>
+          <input type="text" id="name" name="name" value="<%= listing.name %>" required />
+
+          <label for="condition">Condition</label>
+          <select id="condition" name="condition" required>
+            <option value="New" <%= listing && listing.condition === 'New' ? 'selected' : '' %>>New</option>
+            <option value="Like New" <%= listing && listing.condition === 'Like New' ? 'selected' : '' %>>Like New</option>
+            <option value="Very Good" <%= listing && listing.condition === 'Very Good' ? 'selected' : '' %>>Very Good</option>
+            <option value="Good" <%= listing && listing.condition === 'Good' ? 'selected' : '' %>>Good</option>
+            <option value="Other" <%= listing && listing.condition === 'Other' ? 'selected' : '' %>>Other</option>
+          </select>
+
+          <label for="price">Price</label>
+          <input type="number" id="price" name="price" value="<%= listing.price %>" step="0.01" required />
+
+          <label for="image">Image</label>
+          <input type="file" id="image" name="image" accept="image/*" />
+
+          <label for="description">Description</label>
+          <textarea id="description" name="description" required minlength="10"><%= listing.description %></textarea>
+
+          <button type="submit" class="primary-button">Submit</button>
+        </form>
       </div>
     </div>
 

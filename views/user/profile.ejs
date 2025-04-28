@@ -9,33 +9,42 @@
       <!-- Profile Card -->
       <div class="profile-card">
         <div class="profile-info">
-          <i class="fa-solid fa-circle-user"></i>
-          <!-- <img src="profile.jpg" alt="Profile Picture" /> -->
+          <img src="<%= user.profilePicture %>" alt="Profile Picture" />
           <div class="profile-name">
-            <h2>Tina Turner</h2>
-            <p><strong>Student</strong></p>
+            <h2><%= user.firstName %> <%= user.lastName %></h2>
+            <p><strong><%= user.username %></strong></p>
+            <% if(typeof globalUser !== "undefined" && globalUser._id.toString() === user._id.toString()) { %>
+            <a class="secondary-button" href="/edit">Edit Profile</a>
+            <% } %>
           </div>
         </div>
-        <p>I am a second-year student at UNC Charlotte majoring in Interactive UX/UI Design...</p>
+        <% if(user.bio) { %>
+        <p><%= user.bio %></p>
+        <% } else { %>
+        <p>No bio available.</p>
+        <% } %>
       </div>
 
-      <!-- Product Grid -->
-        <div class="product-card">
-          <img src="/assets/images/blank.png" alt="Product Image" />
-          <p><a href="/details">Product Title</a></p>
-          <p class="price">Asking Price: $22.50</p>
-        </div>
-        <div class="product-card">
-          <img src="/assets/images/blank.png" alt="Product Image" />
-          <p><a href="/details">Product Title</a></p>
-          <p class="price">Asking Price: $22.50</p>
-        </div>
-        <div class="product-card">
-          <img src="/assets/images/blank.png" alt="Product Image" />
-          <p><a href="/details">Product Title</a></p>
-          <p class="price">Asking Price: $22.50</p>
+      <!-- User's Listings -->
+      <% if(listings.length == 0) { %>
+      <h1>No listings posted.</h1>
+      <% } else { %>
+      <div class="products-container">
+        <h1>Listings</h1>
+        <div class="product-grid">
+          <% listings.forEach(listing => { %>
+          <a href="/listings/details/<%= listing.id %>" class="product-card">
+            <img src="<%= listing.image %>" alt="<%= listing.name %>" />
+            <p><%= listing.name %></p>
+            <p class="description"><%= listing.description %></p>
+            <p class="price">Asking Price: $<%= listing.price %></p>
+            <p class="offer">Best Offer: $<%= listing.highestOffer %></p>
+            <p class="status"><%= listing.active ? 'Active' : 'Inactive' %></p>
+          </a>
+          <% }) %>
         </div>
       </div>
+      <% } %>
     </div>
 
     <%- include('../partials/footer') %>
