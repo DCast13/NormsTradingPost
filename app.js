@@ -170,7 +170,7 @@ app.get("/details", (req, res) => {
 });
 
 // Inbox route
-app.get("/inbox", (req, res) => {
+app.get("/listings/inbox", (req, res) => {
   if (!req.session.userId) {
     req.flash("error_msg", "Please log in to view your inbox.");
     return res.redirect("/login");
