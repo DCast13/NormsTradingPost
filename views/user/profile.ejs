@@ -36,7 +36,10 @@
           <a href="/listings/details/<%= listing.id %>" class="product-card">
             <img src="<%= listing.image %>" alt="<%= listing.name %>" />
             <p><%= listing.name %></p>
+            <p class="description"><%= listing.description %></p>
             <p class="price">Asking Price: $<%= listing.price %></p>
+            <p class="offer">Best Offer: $<%= listing.highestOffer %></p>
+            <p class="status"><%= listing.active ? 'Active' : 'Inactive' %></p>
           </a>
           <% }) %>
         </div>

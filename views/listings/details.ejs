@@ -30,6 +30,38 @@
       </div>
     </div>
 
+    <!-- New Offers Section -->
+  <% if (globalUser._id.toString() == listing.seller._id.toString()) { %>
+    <div class="offers-container">
+      <h3>Offers for this Listing</h3>
+      <% if (offers && offers.length > 0) { %>
+        <ul>
+          <% offers.forEach(offer => { %>
+            <li>
+              <strong>Buyer:</strong> <%= offer.buyer.username %> |
+              <strong>Amount:</strong> $<%= offer.amount %> |
+              <strong>Status:</strong> <%= offer.status %>
+              <% if (offer.status === 'Pending' && listing.active) { %>
+                <form action="/listings/offers/<%= offer._id %>/accept" method="POST" style="display:inline;">
+                  <button type="submit" class="accept-button">Accept Offer</button>
+                </form>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>No offers have been made yet.</p>
+      <% } %>
+    </div>
+    <% } %>
+
+    <!-- Reactivate Listing Button -->
+    <% if (!listing.active && globalUser._id.toString() == listing.seller._id.toString()) { %>
+      <form action="/listings/<%= listing._id %>/reactivate" method="POST">
+        <button type="submit" class="reactivate-button">Reactivate Listing</button>
+      </form>
+    <% } %>
+
     <%- include('../partials/footer') %>
   </body>
 </html>
