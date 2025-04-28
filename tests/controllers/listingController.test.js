@@ -9,6 +9,7 @@ before(async () => {
 
 const listingsController = require("../../controllers/listingsController.js");
 const Listing = require("../../models/listing.js");
+const Offer = require("../../models/offer.js");
 
 describe("listingsController", () => {
   afterEach(() => {
@@ -60,6 +61,93 @@ describe("listingsController", () => {
       expect(res.render.calledOnce).to.be.true;
       expect(res.render.calledWith("./listings/browse", { title: "Browse", listings: mockListings })).to.be.true;
       expect(next.called).to.be.false;
+    });
+  });
+
+  describe("reactivateListing", () => {
+    it("should reactivate a listing if the user is the seller", async () => {
+      const req = {
+        params: { id: "listing-id" },
+        session: { userId: "seller-id" },
+        flash: sinon.spy(),
+      };
+      const res = { redirect: sinon.spy() };
+      const next = sinon.spy();
+
+      const mockListing = {
+        _id: "listing-id",
+        seller: "seller-id",
+        save: sinon.stub().resolves(),
+      };
+
+      sinon.stub(Listing, "findById").resolves(mockListing);
+
+      await listingsController.reactivateListing(req, res, next);
+
+      expect(mockListing.active).to.be.true;
+      expect(mockListing.save.calledOnce).to.be.true;
+      expect(req.flash.calledWith("success_msg", "Listing reactivated successfully")).to.be.true;
+      expect(res.redirect.calledWith("/listings/details/listing-id")).to.be.true;
+    });
+  });
+
+  describe("acceptOffer", () => {
+    it("should accept an offer and reject others for the same listing", async () => {
+      const req = {
+        params: { id: "offer-id" },
+        session: { userId: "seller-id" },
+        flash: sinon.spy(),
+      };
+      const res = { redirect: sinon.spy() };
+      const next = sinon.spy();
+
+      const mockOffer = {
+        _id: "offer-id",
+        active: true,
+        listing: { _id: "listing-id", seller: "seller-id" },
+        status: "Pending",
+        save: sinon.stub().resolves(),
+      };
+
+      const populateStub = sinon.stub().resolves(mockOffer);
+      sinon.stub(Offer, "findById").returns({ populate: populateStub });
+      sinon.stub(Listing, "findByIdAndUpdate").resolves();
+      sinon.stub(Offer, "updateMany").resolves();
+
+      await listingsController.acceptOffer(req, res, next);
+
+      expect(mockOffer.status).to.equal("Accepted");
+      expect(mockOffer.save.calledOnce).to.be.true;
+      expect(Offer.updateMany.calledWith({ listing: "listing-id", _id: { $ne: "offer-id" } }, { status: "Rejected" })).to.be.true;
+      expect(req.flash.calledWith("success_msg", "Offer accepted successfully")).to.be.true;
+      expect(res.redirect.calledWith("/listings/details/listing-id")).to.be.true;
+    });
+  });
+
+  describe("createOffer", () => {
+    it("should create a new offer and update the listing's highest offer", async () => {
+      const req = {
+        params: { id: "listing-id" },
+        body: { amount: 100 },
+        session: { userId: "buyer-id" },
+      };
+      const res = { redirect: sinon.spy() };
+      const next = sinon.spy();
+
+      const mockListing = {
+        _id: "listing-id",
+        active: true,
+      };
+
+      sinon.stub(Listing, "findById").resolves(mockListing);
+      sinon.stub(Offer.prototype, "save").resolves();
+      sinon.stub(Listing, "findByIdAndUpdate").resolves();
+
+      await listingsController.createOffer(req, res, next);
+
+      expect(Offer.prototype.save.calledOnce).to.be.true;
+      expect(Listing.findByIdAndUpdate.calledWith("listing-id", { $inc: { totalOffers: 1 }, $max: { highestOffer: 100 } })).to.be.true;
+      expect(res.redirect.calledWith("/listings/details/listing-id")).to.be.true;
     });
   });
 });
