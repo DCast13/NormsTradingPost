@@ -75,16 +75,18 @@ exports.login = async (req, res, next) => {
 // Render the user's profile page
 exports.getUserProfile = async (req, res, next) => {
   const { username } = req.params;
+
   const user = await User.findOne({ username });
   if (!user) {
     req.flash("error_msg", "User not found");
     return res.redirect("/browse");
   }
+
   let id = user._id;
-  Promise.all([User.findById(id), Listing.find({ seller: id }), Offer.find({ seller: id }).populate("listing", "name")])
+  Promise.all([Listing.find({ seller: id }), Offer.find({ seller: id }).populate("listing", "name")])
     .then((results) => {
-      const [user, listings, offers] = results;
-      res.render("user/profile", { title: username, user, currentUser: req.session.userId, listings, offers });
+      const [listings, offers] = results;
+      res.render("user/profile", { title: username, user, listings, offers });
     })
     .catch((err) => next(err));
 };

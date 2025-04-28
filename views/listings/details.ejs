@@ -12,7 +12,7 @@
         <h3>$<%=listing.price%></h3>
         <p><%=listing.description%></p>
 
-        <% if (globalUser._id.toString() == listing.seller._id.toString()) { %>
+        <% if (typeof globalUser !== "undefined" && globalUser._id.toString() === listing.seller._id.toString()) { %>
         <form>
           <div class="button-group">
             <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
