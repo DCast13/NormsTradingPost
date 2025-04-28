@@ -14,6 +14,7 @@ exports.create = async (req, res, next) => {
   let user = new User({ email, password, firstName, lastName });
 
   try {
+    // Check if the email already exists in the database
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.render("user/register", {
@@ -23,7 +24,9 @@ exports.create = async (req, res, next) => {
       });
     }
 
+    // Save the new user to the database
     await user.save();
+    req.session.userId = user._id;
     req.flash("success_msg", "User registered successfully");
     res.redirect("/listings/browse");
   } catch (err) {
@@ -35,9 +38,16 @@ exports.create = async (req, res, next) => {
   }
 };
 
+// Render the login page
+exports.getUserLogin = (req, res) => {
+  res.render("user/login", { title: "Login" });
+};
+
+// Log in a user
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
   try {
+    // Check if email exists in the database
     const user = await User.findOne({ email });
 
     // If user not found or passwords don't match, return an error
@@ -49,9 +59,10 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    // Set the user ID in the session and redirect to the listings page
     req.session.userId = user._id;
     req.flash("success_msg", "Logged in successfully");
-    res.redirect("/browse");
+    res.redirect("/listings/browse");
   } catch (err) {
     return res.render("user/login", {
       title: "Login",

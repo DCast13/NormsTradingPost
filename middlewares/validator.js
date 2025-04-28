@@ -6,13 +6,17 @@ const fs = require("fs");
 const { promisify } = require("util");
 const unlinkAsync = promisify(fs.unlink);
 
+// Middleware to check if the user is already authenticated
+// Redirects to the browse page if the user is logged in
 exports.checkAuthenticated = (req, res, next) => {
   if (req.session.userId) {
-    return res.redirect("/browse");
+    return res.redirect("/listings/browse");
   }
   next();
 };
 
+// Middleware to ensure the user is authenticated
+// Redirects to the login page if the user is not logged in
 exports.ensureAuthenticated = (req, res, next) => {
   if (req.session.userId) {
     return next();
@@ -22,11 +26,13 @@ exports.ensureAuthenticated = (req, res, next) => {
   }
 };
 
+// Middleware to validate listing data
 exports.validateListing = [
-  body("title")
+  // Validate and sanitize the name field
+  body("name")
     .trim()
     .notEmpty()
-    .withMessage("Title is required")
+    .withMessage("Name is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
 
   // Validate the condition field to ensure it matches allowed values
@@ -39,7 +45,7 @@ exports.validateListing = [
   body("description")
     .trim()
     .notEmpty()
-    .withMessage("Details are required")
+    .withMessage("Description is required")
     .customSanitizer((value) => validator.stripLow(value, true)),
 
   // Middleware to handle validation errors
@@ -89,7 +95,9 @@ exports.validateOffer = [
   },
 ];
 
+// Middleware to validate user data
 exports.validateUser = [
+  // Validate and normalize the email field
   body("email")
     .optional()
     .trim()

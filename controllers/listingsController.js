@@ -3,6 +3,7 @@ const model = require("../models/listing");
 const Offer = require("../models/offer");
 const { deleteFile } = require("../middlewares/validator");
 
+// Get all active listings, optionally filtered by a search query
 exports.getAllListings = (req, res, next) => {
   const search = req.query.search;
 
@@ -25,6 +26,7 @@ exports.sell = (req, res) => {
   res.render("./listings/sell", { title: "Post Listing" });
 };
 
+// Create a new listing
 exports.create = (req, res, next) => {
   let listing = new model(req.body);
   listing.seller = req.session.userId;
@@ -44,6 +46,7 @@ exports.create = (req, res, next) => {
     });
 };
 
+// Get details of a specific listing by ID
 exports.details = (req, res, next) => {
   let id = req.params.id;
 
@@ -74,6 +77,7 @@ exports.details = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+// Render the edit page for a specific listing
 exports.edit = (req, res, next) => {
   let id = req.params.id;
   model
@@ -97,6 +101,7 @@ exports.edit = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+// Update a specific listing by ID
 exports.update = (req, res, next) => {
   let updatedListing = req.body;
   let id = req.params.id;

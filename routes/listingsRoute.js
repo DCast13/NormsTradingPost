@@ -1,4 +1,5 @@
 const express = require("express");
+const controller = require("../controllers/listingsController");
 const router = express.Router();
 const { validateListing, ensureAuthenticated, uploadListingPicture } = require("../middlewares/validator");
 
