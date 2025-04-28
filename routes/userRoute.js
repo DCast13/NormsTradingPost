@@ -5,18 +5,26 @@ const User = require("../models/user");
 
 const router = express.Router();
 
-router.get("/profile", ensureAuthenticated, (req, res) => {
-  res.render("user/profile");
-});
-router.get("/register", (req, res) => {
-  res.render("user/register");
-});
-router.get("/login", checkAuthenticated, (req, res) => {
-  res.render("user/login");
-});
+// Render profile page
+router.get("/profile/:username", ensureAuthenticated, controller.getUserProfile);
 
+// Handle modifying users
+router.get("/edit", ensureAuthenticated, controller.getUserEdit);
+router.post("/edit", ensureAuthenticated, uploadProfilePicture.single("profilePicture"), validateUser, controller.edit);
+
+// Render the registration page
+router.get("/register", controller.getUserRegister);
+
+// Handle user registration
 router.post("/register", validateUser, controller.create);
-router.post("/login", validateUser, controller.login);
+
+// Render the login page
+router.get("/login", checkAuthenticated, controller.getUserLogin);
+
+// Handle user login
+router.post("/login", checkAuthenticated, validateUser, controller.login);
+
+// Handle user logout
 router.get("/logout", controller.logout);
 
 module.exports = router;

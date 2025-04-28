@@ -93,9 +93,12 @@ header {
   margin-left: 15px;
 }
 
-.header-icons .icon img {
-  width: 30px;
-  height: 30px;
+.header-icons img {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-green);
+  object-fit: scale-down;
 }
 
 .header-icons .profile-pic {
@@ -317,7 +320,7 @@ section .testimonials {
 
 .products-container {
   flex: 1;
-  margin-left: 20px;
+  margin: 0 20px;
 }
 
 .sort-buttons {
@@ -346,6 +349,7 @@ section .testimonials {
 .product-card {
   padding: 15px;
   border-radius: 8px;
+  border: var(--primary-green) 2px solid;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   text-align: center;
   aspect-ratio: 1 / 1.5;
@@ -355,6 +359,7 @@ section .testimonials {
   width: 100%;
   object-fit: cover;
   border-radius: 5px;
+  border: 1px solid var(--primary-green);
 }
 
 .product-card p {
@@ -390,11 +395,13 @@ section .testimonials {
 
 .details-container img {
   margin-right: 10%;
+  border: 1px solid var(--primary-green);
   border-radius: 8px;
 }
 
 .details {
   max-width: 450px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
 }
@@ -439,6 +446,13 @@ section .testimonials {
   border-radius: 4px;
 }
 
+.details input {
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid var(--primary-green);
+  border-radius: 4px;
+}
+
 .details button {
   width: 80%;
   padding: 15px;
@@ -467,6 +481,81 @@ section .testimonials {
 .details .faq p {
   font-size: 14px;
   color: #666;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.button-group button {
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background-color: var(--secondary-jasper);
+  color: var(--black);
+}
+
+.button-group button:hover {
+  background-color: var(--primary-gold);
+}
+
+/* Offers Container Styling */
+.offers-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--white);
+  border: 1px solid var(--primary-green);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.offers-container h3 {
+  font-size: 1.5rem;
+  color: var(--primary-green);
+  margin-bottom: 15px;
+}
+
+.offers-container ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+}
+
+.offers-container li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--secondary-jasper);
+  border: 1px solid var(--primary-green);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.offers-container .accept-button {
+  background-color: var(--primary-green);
+  color: var(--white);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.offers-container .accept-button:hover {
+  background-color: var(--primary-gold);
 }
 
 /* DETAILS.EJS END */
@@ -528,18 +617,14 @@ section .testimonials {
 
 /* PROFILE */
 .profile-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
   width: 100%;
 }
 
 .profile-card {
   background: white;
   padding: 20px;
-  border-radius: 10px;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   grid-column: span 2;
 }
 

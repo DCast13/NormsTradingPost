@@ -40,9 +40,19 @@ const mongUri = "mongodb+srv://admin:admin123@cluster0.zvlta.mongodb.net/normsTr
 // Middleware
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(morgan("tiny"));
-app.use(methodOverride("_method"));
+
+// Connect to MongoDB
+if (!process.argv.includes("--test")) {
+  mongoose
+    .connect(mongUri)
+    .then(() => {
+      // Start server
+      app.listen(port, host, () => {
+        console.log(`Server is running on http://${host}:${port}`);
+      });
+    })
+    .catch((err) => console.log(err.message));
+}
 
 // Session configuration
 app.use(
@@ -64,8 +74,6 @@ app.use(async (req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
   res.locals.currentPath = req.path;
-  res.locals.isAuthenticated = req.session.userId ? true : false;
-  
   if (req.session.userId) {
     try {
       res.locals.globalUser = await User.findById(req.session.userId);
@@ -346,7 +354,9 @@ app.post("/login", (req, res) => {
 app.use("/listings", listingsRoutes);
 app.use("/", userRoutes);
 
-// Error handlers
+app.use("/", userRoutes);
+
+// Middleware for handling 404 errors
 app.use((req, res, next) => {
   const err = new Error("The server cannot locate " + req.url);
   err.status = 404;
@@ -354,12 +364,15 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500);
-  res.render("error", { 
-    error: {
-      status: err.status || 500,
-      message: err.message || "Internal Server Error"
-    } 
-  });
+  if (!process.argv.includes("--test")) {
+    console.log(err.stack); // Only log errors if not in test mode
+  }
+  if (!err.status) {
+    err.status = 500;
+    err.message = "Internal Server Error";
+  }
+  res.status(err.status);
+  res.render("error", { error: err });
 });
+
+module.exports = app;
