@@ -55,7 +55,7 @@ exports.details = (req, res, next) => {
       if (listing) {
         // Fetch offers for the listing
         Offer.find({ listing: id })
-          .populate("buyer", "username firstName lastName")
+          .populate("buyer", "username email firstName lastName")
           .then((offers) => {
             res.render("./listings/details", { title: listing.name, listing, offers });
           })
