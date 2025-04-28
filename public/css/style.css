@@ -455,6 +455,7 @@ section .testimonials {
 
 .details {
   max-width: 450px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
 }
@@ -493,6 +494,13 @@ section .testimonials {
 
 .details select {
   width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid var(--primary-green);
+  border-radius: 4px;
+}
+
+.details input {
   padding: 10px;
   margin-bottom: 20px;
   border: 1px solid var(--primary-green);
@@ -551,7 +559,58 @@ section .testimonials {
   background-color: var(--primary-gold);
 }
 
+/* Offers Container Styling */
+.offers-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--white);
+  border: 1px solid var(--primary-green);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
+.offers-container h3 {
+  font-size: 1.5rem;
+  color: var(--primary-green);
+  margin-bottom: 15px;
+}
+
+.offers-container ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+}
+
+.offers-container li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--secondary-jasper);
+  border: 1px solid var(--primary-green);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.offers-container .accept-button {
+  background-color: var(--primary-green);
+  color: var(--white);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.offers-container .accept-button:hover {
+  background-color: var(--primary-gold);
+}
 
 /* DETAILS.EJS END */
 
