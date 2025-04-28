@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const model = require("../models/listing");
 const Offer = require("../models/offer");
 const { deleteFile } = require("../middlewares/validator");
@@ -48,6 +49,13 @@ exports.create = (req, res, next) => {
 // Get details of a specific listing by ID
 exports.details = (req, res, next) => {
   let id = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    let err = new Error("Cannot find a listing with id: " + id);
+    err.status = 404;
+    return next(err);
+  }
+
   model
     .findById(id)
     .populate("seller", "firstName lastName")
@@ -75,13 +83,20 @@ exports.edit = (req, res, next) => {
   model
     .findById(id)
     .then((listing) => {
-      if (listing) {
-        res.render("./listings/edit", { title: "Edit Listing", listing });
-      } else {
+      if (!listing) {
         let err = new Error("Cannot find a listing with id: " + id);
         err.status = 404;
-        next(err);
+        return next(err);
       }
+
+      // Check if the logged-in user is the owner of the listing
+      if (listing.seller.toString() !== req.session.userId) {
+        let err = new Error("Unauthorized: You are not the owner of this listing.");
+        err.status = 403;
+        return next(err);
+      }
+
+      res.render("./listings/edit", { title: "Edit Listing", listing });
     })
     .catch((err) => next(err));
 };
@@ -128,16 +143,36 @@ exports.update = (req, res, next) => {
 // Delete a specific listing by ID
 exports.delete = (req, res, next) => {
   let id = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    let err = new Error("Id is not valid: " + id);
+    err.status = 500;
+    return next(err);
+  }
+
   model
-    .findOneAndDelete({ _id: id }, { useFindAndModify: false })
+    .findById(id)
+    .then((listing) => {
+      if (!listing) {
+        let err = new Error("Cannot find a listing with id: " + id);
+        err.status = 404;
+        return next(err);
+      }
+
+      // Check if the logged-in user is the owner of the listing
+      if (listing.seller.toString() !== req.session.userId) {
+        console.log("Seller ID: ", listing.seller.toString(), " is not User ID: ", req.session.userId);
+        let err = new Error("Unauthorized: You are not the owner of this listing.");
+        err.status = 403;
+        return next(err);
+      }
+
+      return model.findOneAndDelete({ _id: id }, { useFindAndModify: false });
+    })
     .then((listing) => {
       if (listing) {
         deleteFile(listing.image);
         res.redirect("/listings/browse");
-      } else {
-        let err = new Error("Cannot find a listing with id: " + id);
-        err.status = 404;
-        next(err);
       }
     })
     .catch((err) => next(err));

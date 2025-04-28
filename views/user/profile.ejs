@@ -13,7 +13,7 @@
           <div class="profile-name">
             <h2><%= user.firstName %> <%= user.lastName %></h2>
             <p><strong><%= user.username %></strong></p>
-            <% if(user._id.toString() === currentUser.toString()) { %>
+            <% if(typeof globalUser !== "undefined" && globalUser._id.toString() === user._id.toString()) { %>
             <a class="secondary-button" href="/edit">Edit Profile</a>
             <% } %>
           </div>

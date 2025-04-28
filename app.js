@@ -22,15 +22,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-mongoose
-  .connect(mongUri)
-  .then(() => {
-    // Start server
-    app.listen(port, host, () => {
-      console.log(`Server is running on http://${host}:${port}`);
-    });
-  })
-  .catch((err) => console.log(err.mesage));
+if (!process.argv.includes("--test")) {
+  mongoose
+    .connect(mongUri)
+    .then(() => {
+      // Start server
+      app.listen(port, host, () => {
+        console.log(`Server is running on http://${host}:${port}`);
+      });
+    })
+    .catch((err) => console.log(err.message));
+}
 
 // Middleware for session handling
 app.use(
@@ -96,7 +98,9 @@ app.use((req, res, next) => {
 
 // Middleware for handling other errors
 app.use((err, req, res, next) => {
-  console.log(err.stack);
+  if (!process.argv.includes("--test")) {
+    console.log(err.stack); // Only log errors if not in test mode
+  }
   if (!err.status) {
     err.status = 500;
     err.message = "Internal Server Error";
@@ -104,3 +108,5 @@ app.use((err, req, res, next) => {
   res.status(err.status);
   res.render("error", { error: err });
 });
+
+module.exports = app;

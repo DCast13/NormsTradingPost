@@ -447,6 +447,7 @@ section .testimonials {
 
 .details-container img {
   margin-right: 10%;
+  border: 1px solid var(--primary-green);
   border-radius: 8px;
   max-width: 100%;
   max-height: 400px;

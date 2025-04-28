@@ -20,7 +20,7 @@
       <a href="/listings/sell" class="icon">
         <i class="fa-solid fa-circle-plus"></i>
       </a>
-      <% if (globalUser) { %>
+      <% if (typeof globalUser !== "undefined") { %>
         <a href="/profile/<%= globalUser.username %>" class="icon">
           <img src="<%= globalUser.profilePicture %>" />
         </a>

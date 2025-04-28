@@ -12,7 +12,7 @@
         <input type="file" id="profilePicture" name="profilePicture" accept="image/*" />
 
         <label for="username">Username</label>
-        <input type="text" id="username" name="username" value="<%= globalUser.username %>" placeholder="Enter your username" required />
+        <input type="text" id="username" name="username" value="<%= globalUser.username || (typeof username !== 'undefined' ? username : '') %>" placeholder="Enter your username" required />
 
         <label for="password">Password</label>
         <input type="password" id="password" name="password" placeholder="Enter your password" />
