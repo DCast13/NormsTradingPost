@@ -28,11 +28,30 @@ exports.getAllListings = (req, res, next) => {
       sortOption = { createdAt: -1 }; // Newest first
   }
 
+  // Category filtering
+  const category = req.query.category; // Get category from query parameters
+  if (category) {
+    switch (category) {
+      case "books":
+        query.category = "Books"; // Filter for books
+        break;
+      case "dorm":
+        query.category = "Dorm Essentials"; // Filter for dorm-related items
+        break;
+      case "electronics":
+        query.category = "Electronics"; // Filter for electronics
+        break;
+      default:
+        // No category filter applied
+        break;
+    }
+  }
+
   // Fetch and sort listings
   model
     .find(query)
     .sort(sortOption)
-    .then((listings) => res.render("./listings/browse", { listings, search, sort }))
+    .then((listings) => res.render("./listings/browse", { listings, search, sort, category }))
     .catch((err) => next(err));
 };
 

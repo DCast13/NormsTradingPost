@@ -8,17 +8,48 @@
     <div class="browse-container">
       <!-- Sidebar for filters -->
       <div class="sidebar">
-        <h3>Keywords</h3>
-        <div class="filters">
-          <button>Spring ✕</button>
-          <button>Smart ✕</button>
-          <button>Modern ✕</button>
-        </div>
-
+        <h3>Category</h3>
         <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
+          <label>
+            <input
+              type="radio"
+              name="category"
+              value="books"
+                onchange="window.location.href='?category=books<%= search ? `&search=${encodeURIComponent(search)}` : '' %>'"
+              <%= category === 'books' ? 'checked' : '' %>
+            />
+            Books
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="category"
+              value="dorm"
+              onchange="window.location.href='?category=dorm<%= search ? `&search=${encodeURIComponent(search)}` : '' %>'"
+              <%= category === 'dorm' ? 'checked' : '' %>
+            />
+            Dorm Essentials
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="category"
+              value="electronics"
+              onchange="window.location.href='?category=electronics<%= search ? `&search=${encodeURIComponent(search)}` : '' %>'"
+              <%= category === 'electronics' ? 'checked' : '' %>
+            />
+            Electronics
+          </label>
+          <label>
+            <input
+              type="radio"
+              name="category"
+              value=""
+              onchange="window.location.href='?<%= search ? `search=${encodeURIComponent(search)}` : '' %>'"
+              <%= !category ? 'checked' : '' %>
+            />
+            All Categories
+          </label>
         </div>
 
         <h3>Price</h3>
@@ -28,20 +59,6 @@
             <span>Asking Price: $0</span>
             <span>$100</span>
           </div>
-        </div>
-
-        <h3>Color</h3>
-        <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-        </div>
-
-        <h3>Size</h3>
-        <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
         </div>
       </div>
 
