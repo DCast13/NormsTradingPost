@@ -1,13 +1,18 @@
 <header>
   <div class="header-container">
-    <% if (currentPath === '/browse') { %>
+    <% if (currentPath === '/listings/browse') { %>
       <a href="/" class="logo">
     <% } else { %>
-      <a href="/browse" class="logo">
+      <a href="/listings/browse" class="logo">
     <% } %>
       <img src="/assets/images/NORM.png" alt="Logo" />
     </a>
-    <input type="text" class="search-bar" placeholder="Search..." />
+    <form action="/listings/browse" method="GET" class="search-form">
+      <input type="text" class="search-bar" name="search" placeholder="Search..." />
+      <button type="submit" class="search-button">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
     <div class="header-icons">
       <a href="/inbox" class="icon">
         <i class="fa-regular fa-message"></i>
@@ -15,13 +20,17 @@
       <a href="#" class="icon">
         <i class="fa-regular fa-heart"></i>
       </a>
-      <a href="/sell" class="icon">
+      <a href="/listings/sell" class="icon">
         <i class="fa-solid fa-circle-plus"></i>
       </a>
-      <a href="/profile" class="icon">
-        <!-- <img src="/path/to/profile-pic.png" alt="Profile" class="profile-pic" /> -->
-        <i class="fa-solid fa-circle-user"></i>
-      </a>
+      <% if (globalUser) { %>
+        <a href="/profile/<%= globalUser.username %>" class="icon">
+          <img src="<%= globalUser.profilePicture %>" />
+        </a>
+      <% } else { %>
+        <a href="/login" class="icon"><i class="fa-solid fa-circle-user"></i></a>
+      <% } %>
+          
       <a href="/logout" class="icon">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
       </a>

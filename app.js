@@ -1,15 +1,19 @@
 const express = require("express");
+const morgan = require("morgan");
+const methodOverride = require("method-override");
 const mongoose = require("mongoose");
 const path = require("path");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
+const userRoutes = require("./routes/userRoute");
+const listingsRoutes = require("./routes/listingsRoute");
 
 // Firebase Admin SDK
 const admin = require("firebase-admin");
 const serviceAccount = require("./firebase-service-account.json");
 
-// Initialize Firebase Admin
+// Initialize Firebase
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://webapp-d140b-default-rtdb.firebaseio.com",
@@ -18,52 +22,27 @@ admin.initializeApp({
 
 const db = admin.database();
 
-// Test Firebase Realtime Database connection
+// Test Firebase connection
 db.ref("test")
   .set({ connected: true })
-  .then(() => {
-    console.log("✅ Firebase Realtime Database write succeeded.");
-  })
-  .catch((error) => {
-    console.error("❌ Firebase Realtime Database write failed:", error.message);
-  });
+  .then(() => console.log("Firebase connected successfully"))
+  .catch(error => console.error(" Firebase connection failed:", error.message));
 
-// Test Firebase Admin connection via Auth
-admin
-  .auth()
-  .listUsers(1)
-  .then(() => {
-    console.log("✅ Firebase Auth connected successfully.");
-  })
-  .catch((error) => {
-    console.error("❌ Firebase Auth connection failed:", error.message);
-  });
-
-// Create Express app
+// Create app
 const app = express();
-let port = 3001;
-let host = "localhost";
 
-// Set view engine
+// Configure app
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || "localhost";
 app.set("view engine", "ejs");
-
-// MongoDB URI
-const mongUri =
-  "mongodb+srv://admin:admin123@cluster0.zvlta.mongodb.net/normsTradingPost?retryWrites=true&w=majority&appName=Cluster0";
+const mongUri = "mongodb+srv://admin:admin123@cluster0.zvlta.mongodb.net/normsTradingPost?retryWrites=true&w=majority&appName=Cluster0";
 
 // Middleware
-app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
-
-// Connect to MongoDB
-mongoose
-  .connect(mongUri)
-  .then(() => {
-    app.listen(port, host, () => {
-      console.log(`Server is running on http://${host}:${port}`);
-    });
-  })
-  .catch((err) => console.log(err.message));
+app.use(express.json());
+app.use(morgan("tiny"));
+app.use(methodOverride("_method"));
 
 // Session configuration
 app.use(
@@ -71,7 +50,7 @@ app.use(
     secret: "ajfeirf90aeu9eroejfoefj",
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({ mongoUrl: mongUri }),
+    store: MongoStore.create({ mongoUrl: mongUri }),
     cookie: { maxAge: 60 * 60 * 1000 },
   })
 );
@@ -79,77 +58,62 @@ app.use(
 // Flash messages
 app.use(flash());
 
-// Set global template variables
-app.use((req, res, next) => {
+// Global variables middleware
+const User = require("./models/user");
+app.use(async (req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
-  res.locals.isAuthenticated = req.session.userId ? true : false;
   res.locals.currentPath = req.path;
+  res.locals.isAuthenticated = req.session.userId ? true : false;
+  
+  if (req.session.userId) {
+    try {
+      res.locals.globalUser = await User.findById(req.session.userId);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      res.locals.globalUser = null;
+    }
+  } else {
+    res.locals.globalUser = null;
+  }
   next();
 });
 
-// Route to handle login form submission
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-
-  // Log login attempt to Firebase Realtime Database
-  const sanitizedEmail = email.replace(/[.#$[\]]/g, "_"); // Replace special characters
-  const loginAttemptRef = db.ref(`loginAttempts/${sanitizedEmail}`);
-
-  loginAttemptRef
-    .set({
-      email,
-      timestamp: admin.database.ServerValue.TIMESTAMP,
-    })
-    .then(() => {
-      console.log(`Login attempt logged for email: ${email}`);
-      // Save user session
-      req.session.userId = email;
-      req.flash("success_msg", "Login successful!");
-      res.redirect("/browse"); // Redirect to browse page
-    })
-    .catch((error) => {
-      console.error("Failed to log login attempt:", error.message);
-      req.flash("error_msg", "Login failed!");
-      res.redirect("/login");
+// Connect to MongoDB
+mongoose.connect(mongUri)
+  .then(() => {
+    app.listen(port, host, () => {
+      console.log(`Server is running on http://${host}:${port}`);
     });
+  })
+  .catch(err => console.error("MongoDB connection error:", err.message));
+
+// Routes
+app.get("/", (req, res) => {
+  res.render("landing");
 });
 
-
-
-
-
-
-
-
-
-// Route to display all items listed for sale
+// Browse items route
 app.get("/browse", (req, res) => {
-  // Ensure user is logged in
   if (!req.session.userId) {
     req.flash("error_msg", "Please log in to access this page.");
     return res.redirect("/login");
   }
 
-  // Firebase reference for sell items
   const sellItemsRef = db.ref("sellItems");
 
-  sellItemsRef
-    .once("value")
+  sellItemsRef.once("value")
     .then((snapshot) => {
-      // Fetch all items or initialize as an empty object
       const allItems = snapshot.val() || {};
       const productList = [];
 
-      // Extract all items from all users
       Object.keys(allItems).forEach((userKey) => {
         const userItems = allItems[userKey];
         if (userItems) {
-          productList.push(...Object.values(userItems)); // Flatten user items into productList
+          productList.push(...Object.values(userItems));
         }
       });
 
-      // Render the 'browse' page with the list of products
       res.render("listings/browse", {
         title: "Browse Items",
         user: req.session.userId,
@@ -157,27 +121,13 @@ app.get("/browse", (req, res) => {
       });
     })
     .catch((error) => {
-      // Log errors and display an error message to the user
-      console.error("Error fetching sell items:", error.message);
+      console.error("Error fetching items:", error.message);
       req.flash("error_msg", "Failed to load items.");
       res.redirect("/");
     });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Product details route
 app.get("/details", (req, res) => {
   const productId = req.query.id;
 
@@ -188,8 +138,7 @@ app.get("/details", (req, res) => {
 
   const sellItemsRef = db.ref("sellItems");
 
-  sellItemsRef
-    .once("value")
+  sellItemsRef.once("value")
     .then((snapshot) => {
       const allItems = snapshot.val() || {};
       let product = null;
@@ -197,13 +146,8 @@ app.get("/details", (req, res) => {
       Object.keys(allItems).forEach((userKey) => {
         const userItems = allItems[userKey];
         if (userItems) {
-          // Find the product by ID
-          const item = Object.values(userItems).find(
-            (item) => item.id === productId
-          );
-          if (item) {
-            product = item;
-          }
+          const item = Object.values(userItems).find(item => item.id === productId);
+          if (item) product = item;
         }
       });
 
@@ -212,83 +156,127 @@ app.get("/details", (req, res) => {
         return res.redirect("/browse");
       }
 
-      res.render("listings/details", { product });
+      res.render("listings/details", { 
+        title: "Product Details",
+        product,
+        user: req.session.userId 
+      });
     })
-    .catch((error) => {
-      console.error("Error fetching product details:", error.message);
+    .catch(error => {
+      console.error("Error fetching product:", error.message);
       req.flash("error_msg", "Failed to load product details.");
       res.redirect("/browse");
     });
 });
 
-// Route to render details.ejs page
-app.get("/details", (req, res) => {
-  if (!req.session.userId) {
-    req.flash("error_msg", "Please log in to access this page.");
-    return res.redirect("/login");
-  }
-  res.render("listings/details", { title: "Product Details", user: req.session.userId });
-});
-
-// Route to render inbox.ejs page when the image is clicked
+// Inbox route
 app.get("/inbox", (req, res) => {
   if (!req.session.userId) {
     req.flash("error_msg", "Please log in to view your inbox.");
     return res.redirect("/login");
   }
 
-  // Sample messages data (to be replaced with DB logic)
-  const messages = [
-    { sender: "user1@example.com", text: "Hello! Is the product still available?", timestamp: Date.now() - 60000 },
-    { sender: "user2@example.com", text: "Can I get a discount?", timestamp: Date.now() - 3600000 },
-  ];
+  // Get unique conversation partners
+  const userEmail = req.session.userId.replace(/[.#$[\]]/g, "_");
+  const messagesRef = db.ref(`messages/${userEmail}`);
 
-  res.render("inbox", { title: "Inbox", user: req.session.userId, messages });
+  messagesRef.once("value")
+    .then((snapshot) => {
+      const messages = snapshot.val() || {};
+      const conversations = {};
+
+      // Organize messages by conversation partner
+      Object.values(messages).forEach(msg => {
+        const partner = msg.recipient || msg.sender;
+        if (partner) {
+          conversations[partner] = true;
+        }
+      });
+
+      res.render("inbox", {
+        title: "Inbox",
+        user: req.session.userId,
+        messages: Object.keys(conversations)
+      });
+    })
+    .catch(error => {
+      console.error("Error loading inbox:", error.message);
+      req.flash("error_msg", "Failed to load inbox.");
+      res.redirect("/");
+    });
 });
 
-
-
+// Get messages for specific conversation
 app.get("/messages/:email", (req, res) => {
   if (!req.session.userId) {
-      return res.status(401).json({ error: "Unauthorized" });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const userEmail = req.session.userId.replace(/[.#$[\]]/g, "_"); // Current user
-  const conversationEmail = req.params.email.replace(/[.#$[\]]/g, "_"); // Selected conversation email
+  const userEmail = req.session.userId.replace(/[.#$[\]]/g, "_");
+  const conversationEmail = req.params.email.replace(/[.#$[\]]/g, "_");
+  const messagesRef = db.ref(`messages/${userEmail}`);
 
-  // Path to the user's messages
-  const firebasePath = `messages/${userEmail}`;
-  console.log("Fetching messages from path:", firebasePath);
-
-  // Fetch all messages under the user's path
-  db.ref(firebasePath)
-      .once("value")
-      .then((snapshot) => {
-     
-          const allMessages = snapshot.val() || {}; // Get all messages or an empty object
-          const filteredMessages = Object.values(allMessages).filter((message) => {
-            // Debug each message to understand why it might not pass the filter
-            console.log("Checking message:", message);
-            const isRecipientMatch = message.recipient === conversationEmail;
-            const isSenderMatch = message.sender === conversationEmail;
-            console.log(
-              `Message1111111: ${JSON.stringify(message)}, isRecipientMatch: ${isRecipientMatch}, isSenderMatch: ${isSenderMatch}`
-            );
-            return "hello";
-          });
-
-          // Return filtered messages
-          res.json(filteredMessages);
-          console.log("Fetching messages from path:aaaaa", filteredMessages);
-      })
-      .catch((error) => {
-          console.error("Error fetching messages:", error.message);
-          res.status(500).json({ error: "Failed to load messages." });
+  messagesRef.once("value")
+    .then((snapshot) => {
+      const allMessages = snapshot.val() || {};
+      const filteredMessages = Object.values(allMessages).filter(message => {
+        return message.recipient === conversationEmail || 
+               message.sender === conversationEmail;
       });
+
+      res.json(filteredMessages);
+    })
+    .catch(error => {
+      console.error("Error fetching messages:", error.message);
+      res.status(500).json({ error: "Failed to load messages." });
+    });
 });
 
+// Send message route
+app.post("/send-message", (req, res) => {
+  if (!req.session.userId) {
+    req.flash("error_msg", "Please log in to send messages.");
+    return res.redirect("/login");
+  }
 
-// Route to handle "Sell Item" form submission
+  const { recipient, message } = req.body;
+  if (!recipient || !message) {
+    req.flash("error_msg", "Recipient and message are required.");
+    return res.redirect("/inbox");
+  }
+
+  const sanitizedSender = req.session.userId.replace(/[.#$[\]]/g, "_");
+  const sanitizedRecipient = recipient.replace(/[.#$[\]]/g, "_");
+  const timestamp = Date.now();
+
+  const senderRef = db.ref(`messages/${sanitizedSender}/${timestamp}`);
+  const recipientRef = db.ref(`messages/${sanitizedRecipient}/${timestamp}`);
+
+  const senderData = {
+    recipient: sanitizedRecipient,
+    message,
+    timestamp,
+  };
+
+  const recipientData = {
+    sender: sanitizedSender,
+    message,
+    timestamp,
+  };
+
+  Promise.all([senderRef.set(senderData), recipientRef.set(recipientData)])
+    .then(() => {
+      req.flash("success_msg", "Message sent successfully!");
+      res.redirect("/inbox");
+    })
+    .catch(error => {
+      console.error("Failed to send message:", error.message);
+      req.flash("error_msg", "Failed to send message.");
+      res.redirect("/inbox");
+    });
+});
+
+// Sell item route
 app.post("/sell-item", (req, res) => {
   if (!req.session.userId) {
     req.flash("error_msg", "Please log in to sell an item.");
@@ -296,158 +284,82 @@ app.post("/sell-item", (req, res) => {
   }
 
   const { name, condition, price, description } = req.body;
-
-  // Validate form inputs
   if (!name || !condition || !price || !description) {
     req.flash("error_msg", "All fields are required.");
     return res.redirect("/sell");
   }
 
- // Sanitize the user's email to create a valid Firebase key
-const sanitizedEmail = req.session.userId.replace(/[.#$[\]]/g, "_");
+  const sanitizedEmail = req.session.userId.replace(/[.#$[\]]/g, "_");
+  const productKey = name.replace(/\s+/g, "_").toLowerCase();
+  const sellItemsRef = db.ref(`sellItems/${sanitizedEmail}/${productKey}`);
 
-// Firebase reference for the user's sell items
-const sellItemsRef = db.ref(`sellItems/${sanitizedEmail}`);
+  const itemData = {
+    id: productKey,
+    name,
+    condition,
+    price,
+    description,
+    sellerEmail: req.session.userId,
+    timestamp: admin.database.ServerValue.TIMESTAMP,
+  };
 
-// Create a unique ID for the item (or use the product name as a key)
-const productKey = name.replace(/\s+/g, "_").toLowerCase(); // Create a safe key from the product name
+  sellItemsRef.set(itemData)
+    .then(() => {
+      req.flash("success_msg", "Item listed successfully!");
+      res.redirect("/browse");
+    })
+    .catch(error => {
+      console.error("Failed to list item:", error.message);
+      req.flash("error_msg", "Failed to list item.");
+      res.redirect("/sell");
+    });
+});
 
-// Item data to store in Firebase
-const itemData = {
-  id: productKey, // Using the product name as a key ensures a unique identifier
-  name,
-  condition,
-  price,
-  description,
-  sellerEmail: req.session.userId,
-  timestamp: admin.database.ServerValue.TIMESTAMP,
-};
+// Login route
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    req.flash("error_msg", "Email and password are required.");
+    return res.redirect("/login");
+  }
 
-// Save the item data under the product name key
-sellItemsRef
-  .child(productKey)
-  .set(itemData)
+  const sanitizedEmail = email.replace(/[.#$[\]]/g, "_");
+  const loginAttemptRef = db.ref(`loginAttempts/${sanitizedEmail}`);
+
+  loginAttemptRef.set({
+    email,
+    timestamp: admin.database.ServerValue.TIMESTAMP,
+  })
   .then(() => {
-    console.log(`Item "${name}" added by user: ${req.session.userId}`);
-    req.flash("success_msg", "Item listed for sale successfully!");
+    req.session.userId = email;
+    req.flash("success_msg", "Login successful!");
     res.redirect("/browse");
   })
-  .catch((error) => {
-    console.error("Failed to save item:", error.message);
-    req.flash("error_msg", "Failed to list the item for sale.");
-    res.redirect("/sell");
+  .catch(error => {
+    console.error("Login error:", error.message);
+    req.flash("error_msg", "Login failed.");
+    res.redirect("/login");
   });
-
 });
 
-
-
-
-
-app.get("/browse", (req, res) => {
-  if (!req.session.userId) {
-    req.flash("error_msg", "Please log in to access this page.");
-    return res.redirect("/login");
-  }
-
-  const sellItemsRef = db.ref("sellItems");
-
-  sellItemsRef
-    .once("value")
-    .then((snapshot) => {
-      const allItems = snapshot.val() || {};
-      const productList = [];
-
-      Object.keys(allItems).forEach((userKey) => {
-        const userItems = allItems[userKey];
-        if (userItems) {
-          productList.push(...Object.values(userItems)); // Flatten user items into productList
-        }
-      });
-
-      res.render("listings/browse", {
-        title: "Browse Items",
-        user: req.session.userId,
-        products: productList, // Ensure sellerEmail is part of these objects
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching sell items:", error.message);
-      req.flash("error_msg", "Failed to load items.");
-      res.redirect("/");
-    });
-});
-
-
-// Route to handle sending messages
-app.post("/send-message", (req, res) => {
-  const { recipient, message, recipientName } = req.body;
-
-  // Check if the user is logged in
-  if (!req.session.userId) {
-    req.flash("error_msg", "Please log in to send messages.");
-    return res.redirect("/login");
-  }
-
-  // Sanitize sender and recipient email to replace invalid characters
-  const sanitizedSender = req.session.userId.replace(/[.#$[\]]/g, "_");
-  const sanitizedRecipient = recipient.replace(/[.#$[\]]/g, "_");
-
-  // Validate inputs
-  if (!recipient || !message) {
-    req.flash("error_msg", "Recipient and message are required.");
-    return res.redirect("/inbox");
-  }
-
-  // Provide a fallback for recipientName if it's missing
-  const safeRecipientName = recipientName || "Unknown Recipient";
-
-  // Generate timestamp as the unique key
-  const timestamp = Date.now();
-
-  // Firebase Realtime Database references
-  const senderRef = db.ref(`messages/${sanitizedSender}/${timestamp}`);
-  const recipientRef = db.ref(`messages/${sanitizedRecipient}/${timestamp}`);
-
-  // Sender's data
-  const senderData = {
-    recipient,
-    recipientName: safeRecipientName,
-    message,
-    timestamp,
-  };
-
-  // Recipient's data
-  const recipientData = {
-    sender: req.session.userId,
-    message,
-    timestamp,
-  };
-
-  // Save data for both sender and recipient
-  Promise.all([senderRef.set(senderData), recipientRef.set(recipientData)])
-    .then(() => {
-      console.log(`Message sent to ${recipient}: ${message}`);
-      req.flash("success_msg", "Message sent successfully!");
-      res.redirect("/inbox");
-    })
-    .catch((error) => {
-      console.error("Failed to save message:", error.message);
-      req.flash("error_msg", "Failed to send the message.");
-      res.redirect("/inbox");
-    });
-});
-
-// Route files
-const indexRoutes = require("./routes/indexRoute");
-const userRoutes = require("./routes/userRoute");
-const listingsRoutes = require("./routes/listingsRoute");
-
-app.use("/", indexRoutes);
+// Use route files
+app.use("/listings", listingsRoutes);
 app.use("/", userRoutes);
-app.use("/", listingsRoutes);
 
-// Views and static files
-app.set("views", path.join(__dirname, "views"));
-app.locals.basedir = app.get("views/partials");
-app.use(express.static(path.join(__dirname, "public")));
+// Error handlers
+app.use((req, res, next) => {
+  const err = new Error("The server cannot locate " + req.url);
+  err.status = 404;
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500);
+  res.render("error", { 
+    error: {
+      status: err.status || 500,
+      message: err.message || "Internal Server Error"
+    } 
+  });
+});
