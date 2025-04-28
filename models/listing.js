@@ -18,12 +18,21 @@ const listingSchema = new Schema({
 );
 
 // Middleware to delete related offers when a listing is deleted
-listingSchema.pre('findOneAndDelete', function(next) {
-    const listingId = this.getQuery()['_id'];
-    Offer.deleteMany({ listing: listingId })
-        .then(() => next())
-        .catch(err => next(err));
-});
+listingSchema.pre("findOneAndDelete", async function (next) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      const listingId = this.getQuery()["_id"];
+      await Offer.deleteMany({ listing: listingId }).session(session);
+      await session.commitTransaction();
+      next();
+    } catch (err) {
+      await session.abortTransaction();
+      next(err);
+    } finally {
+      session.endSession();
+    }
+  });
 
 // Export the Listing model
 module.exports = mongoose.model('Listing', listingSchema);

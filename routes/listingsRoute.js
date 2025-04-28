@@ -27,4 +27,10 @@ router.delete("/:id", ensureAuthenticated, controller.delete);
 // Create an offer for a listing
 router.post("/offers/:id", ensureAuthenticated, controller.createOffer);
 
+// Accept an offer for a listing
+router.post("/offers/:id/accept", ensureAuthenticated, controller.acceptOffer);
+
+// Reactivate a listing
+router.post("/:id/reactivate", ensureAuthenticated, controller.reactivateListing);
+
 module.exports = router;

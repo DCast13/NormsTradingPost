@@ -1,12 +1,10 @@
 const model = require("../models/listing");
-const Offer = require('../models/offer');
+const Offer = require("../models/offer");
 const { deleteFile } = require("../middlewares/validator");
-const { title } = require("process");
 
 // Get all active listings, optionally filtered by a search query
 exports.getAllListings = (req, res, next) => {
   const search = req.query.search;
-  console.log(search);
 
   const query = search
     ? {
@@ -55,7 +53,13 @@ exports.details = (req, res, next) => {
     .populate("seller", "firstName lastName")
     .then((listing) => {
       if (listing) {
-        res.render("./listings/details", { title: listing.name, listing });
+        // Fetch offers for the listing
+        Offer.find({ listing: id })
+          .populate("buyer", "username firstName lastName")
+          .then((offers) => {
+            res.render("./listings/details", { title: listing.name, listing, offers });
+          })
+          .catch((err) => next(err));
       } else {
         let err = new Error("Cannot find a listing with id: " + id);
         err.status = 404;
@@ -140,40 +144,105 @@ exports.delete = (req, res, next) => {
 };
 
 // Create an offer for a specific listing by ID
-exports.createOffer = (req, res, next) => {
+exports.createOffer = async (req, res, next) => {
     const listingId = req.params.id;
     const { amount } = req.body;
-
-    // Validate the offer amount
-    if (!amount || amount <= 0) {
-        const err = new Error("Invalid offer amount");
-        err.status = 400;
-        return next(err);
-    }
-
-    // Create a new offer
-    const offer = new Offer({
+  
+    try {
+      // Validate the offer amount
+      if (!amount || isNaN(amount) || amount <= 0) {
+        throw new Error("Invalid offer amount");
+      }
+  
+      // Check if the listing exists and is active
+      const listing = await model.findById(listingId);
+      if (!listing || !listing.active) {
+        throw new Error("Listing not found or inactive");
+      }
+  
+      // Create a new offer
+      const offer = new Offer({
         amount,
-        status: 'Pending',
+        status: "Pending",
         buyer: req.session.userId,
-        listing: listingId
-    });
+        listing: listingId,
+      });
+  
+      await offer.save();
+  
+      // Update the listing's totalOffers and highestOffer
+      await model.findByIdAndUpdate(
+        listingId,
+        {
+          $inc: { totalOffers: 1 },
+          $max: { highestOffer: amount },
+        },
+        { useFindAndModify: false, new: true }
+      );
+  
+      res.redirect(`/listings/details/${listingId}`);
+    } catch (err) {
+      err.status = 400;
+      next(err);
+    }
+  };
 
-    // Save the offer to the database
-    offer.save()
-        .then(() => {
-            // Update the listing's totalOffers and highestOffer
-            return model.findByIdAndUpdate(
-                listingId,
-                {
-                    $inc: { totalOffers: 1 },
-                    $max: { highestOffer: amount }
-                },
-                { useFindAndModify: false, new: true }
-            );
-        })
-        .then(() => {
-            res.redirect(`/listings/details/${listingId}`);
-        })
-        .catch(err => next(err));
+  exports.acceptOffer = async (req, res, next) => {
+    const offerId = req.params.id;
+  
+    try {
+      // Find the offer and populate its listing
+      const offer = await Offer.findById(offerId).populate('listing');
+      if (!offer) {
+        throw new Error('Offer not found');
+      }
+  
+      // Ensure the current user is the seller of the listing
+      if (offer.listing.seller.toString() !== req.session.userId) {
+        throw new Error('Unauthorized action');
+      }
+  
+      // Update the listing status to "Pending"
+      await model.findByIdAndUpdate(offer.listing._id, { active: false });
+  
+      // Update the offer status to "Accepted"
+      offer.status = 'Accepted';
+      await offer.save();
+  
+      // Reject all other offers for the same listing
+      await Offer.updateMany(
+        { listing: offer.listing._id, _id: { $ne: offerId } },
+        { status: 'Rejected' }
+      );
+  
+      req.flash('success_msg', 'Offer accepted successfully');
+      res.redirect(`/listings/details/${offer.listing._id}`);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  exports.reactivateListing = async (req, res, next) => {
+    const listingId = req.params.id;
+
+    try {
+        // Find the listing and ensure the current user is the seller
+        const listing = await model.findById(listingId);
+        if (!listing) {
+            throw new Error("Listing not found");
+        }
+
+        if (listing.seller.toString() !== req.session.userId) {
+            throw new Error("Unauthorized action");
+        }
+
+        // Reactivate the listing
+        listing.active = true;
+        await listing.save();
+
+        req.flash("success_msg", "Listing reactivated successfully");
+        res.redirect(`/listings/details/${listingId}`);
+    } catch (err) {
+        next(err);
+    }
 };
