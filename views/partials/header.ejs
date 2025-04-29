@@ -14,17 +14,16 @@
       </button>
     </form>
     <div class="header-icons">
-    </a>
-    <a href="/listings/inbox" class="icon">
-      <i class="fa-regular fa-message"></i>
-    </a>
+      <a href="/inbox" class="icon">
+        <i class="fa-regular fa-message"></i>
+      </a>
       <a href="#" class="icon">
         <i class="fa-regular fa-heart"></i>
       </a>
       <a href="/listings/sell" class="icon">
         <i class="fa-solid fa-circle-plus"></i>
       </a>
-      <% if (typeof globalUser !== "undefined") { %>
+      <% if (globalUser) { %>
         <a href="/profile/<%= globalUser.username %>" class="icon">
           <img src="<%= globalUser.profilePicture %>" />
         </a>
