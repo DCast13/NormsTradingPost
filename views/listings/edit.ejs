@@ -33,7 +33,7 @@
           <input type="number" id="price" name="price" value="<%= listing.price %>" step="0.01" required />
 
           <label for="image">Image</label>
-          <input type="file" id="image" name="image" />
+          <input type="file" id="image" name="image" accept="image/*" />
 
           <label for="description">Description</label>
           <textarea id="description" name="description" required minlength="10"><%= listing.description %></textarea>

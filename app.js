@@ -22,15 +22,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-mongoose
-  .connect(mongUri)
-  .then(() => {
-    // Start server
-    app.listen(port, host, () => {
-      console.log(`Server is running on http://${host}:${port}`);
-    });
-  })
-  .catch((err) => console.log(err.mesage));
+if (!process.argv.includes("--test")) {
+  mongoose
+    .connect(mongUri)
+    .then(() => {
+      // Start server
+      app.listen(port, host, () => {
+        console.log(`Server is running on http://${host}:${port}`);
+      });
+    })
+    .catch((err) => console.log(err.message));
+}
 
 // Middleware for session handling
 app.use(
@@ -46,12 +48,23 @@ app.use(
 // Middleware for flash messages
 app.use(flash());
 
-// Set global variables for flash messages
-app.use((req, res, next) => {
+const User = require("./models/user");
+
+// Set global variables
+app.use(async (req, res, next) => {
   res.locals.success_msg = req.flash("success_msg");
   res.locals.error_msg = req.flash("error_msg");
-  res.locals.isAuthenticated = req.session.userId ? true : false;
   res.locals.currentPath = req.path;
+  if (req.session.userId) {
+    try {
+      res.locals.globalUser = await User.findById(req.session.userId);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      res.locals.globalUser = null;
+    }
+  } else {
+    res.locals.globalUser = null;
+  }
   next();
 });
 
@@ -74,7 +87,7 @@ app.get("/", (req, res) => {
 
 app.use("/listings", listingsRoutes);
 
-app.use("/user", userRoutes);
+app.use("/", userRoutes);
 
 // Middleware for handling 404 errors
 app.use((req, res, next) => {
@@ -85,7 +98,9 @@ app.use((req, res, next) => {
 
 // Middleware for handling other errors
 app.use((err, req, res, next) => {
-  console.log(err.stack);
+  if (!process.argv.includes("--test")) {
+    console.log(err.stack); // Only log errors if not in test mode
+  }
   if (!err.status) {
     err.status = 500;
     err.message = "Internal Server Error";
@@ -93,3 +108,5 @@ app.use((err, req, res, next) => {
   res.status(err.status);
   res.render("error", { error: err });
 });
+
+module.exports = app;

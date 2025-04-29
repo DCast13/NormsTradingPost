@@ -9,27 +9,58 @@
       <img src="<%= listing.image %>" alt="<%=listing.name%>" />
       <div class="details">
         <h2><%=listing.name%></h2>
-        <span class="tag">Tag</span>
-        <h3><%=listing.price%></h3>
+        <h3>$<%=listing.price%></h3>
         <p><%=listing.description%></p>
 
-        <% if (user == listing.seller._id) { %>
-          <form>
-            <div class="button-group">
-              <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
-            
-              <button type="submit" formmethod="POST" 
-              formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
-            </div>
-          </form>
+        <% if (typeof globalUser !== "undefined" && globalUser._id.toString() === listing.seller._id.toString()) { %>
+        <form>
+          <div class="button-group">
+            <button type="submit" formmethod="GET" formaction="/listings/edit/<%= listing.id %>"><i class="fa fa-edit"></i> Edit</button>
+
+            <button type="submit" formmethod="POST" formaction="/listings/<%= listing.id %>?_method=DELETE"><i class="fa fa-trash"></i> Delete</button>
+          </div>
+        </form>
+        <% } else if (listing.active) { %>
+        <form action="/listings/offers/<%= listing.id %>" method="POST">
+          <label for="amount">Offer Amount:</label>
+          <input type="number" id="amount" name="amount" step="0.01" min="0.01" required />
+          <button type="submit">Make Offer</button>
+        </form>
         <% } %>
-        
-        <div class="faq">
-          <strong>Title</strong>
-          <p>Answer the frequently asked question in a simple sentence, a longish paragraph, or even in a list.</p>
-        </div>
       </div>
     </div>
+
+    <!-- New Offers Section -->
+  <% if (globalUser._id.toString() == listing.seller._id.toString()) { %>
+    <div class="offers-container">
+      <h3>Offers for this Listing</h3>
+      <% if (offers && offers.length > 0) { %>
+        <ul>
+          <% offers.forEach(offer => { %>
+            <li>
+              <strong>Buyer:</strong> <%= offer.buyer.username %>
+              <strong>Amount:</strong> $<%= offer.amount %>
+              <strong>Status:</strong> <%= offer.status %>
+              <% if (offer.status === 'Pending' && listing.active) { %>
+                <form action="/listings/offers/<%= offer._id %>/accept" method="POST" style="display:inline;">
+                  <button type="submit" class="accept-button">Accept Offer</button>
+                </form>
+              <% } %>
+            </li>
+          <% }) %>
+        </ul>
+      <% } else { %>
+        <p>No offers have been made yet.</p>
+      <% } %>
+    </div>
+    <% } %>
+
+    <!-- Reactivate Listing Button -->
+    <% if (!listing.active && globalUser._id.toString() == listing.seller._id.toString()) { %>
+      <form action="/listings/<%= listing._id %>/reactivate" method="POST">
+        <button type="submit" class="reactivate-button">Reactivate Listing</button>
+      </form>
+    <% } %>
 
     <%- include('../partials/footer') %>
   </body>

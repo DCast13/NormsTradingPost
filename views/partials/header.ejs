@@ -1,6 +1,6 @@
 <header>
   <div class="header-container">
-    <% if (currentPath === '/browse') { %>
+    <% if (currentPath === '/listings/browse') { %>
       <a href="/" class="logo">
     <% } else { %>
       <a href="/listings/browse" class="logo">
@@ -32,10 +32,14 @@
       <a href="/listings/sell" class="icon">
         <i class="fa-solid fa-circle-plus"></i>
       </a>
-      <a href="/profile" class="icon">
-        <!-- <img src="/path/to/profile-pic.png" alt="Profile" class="profile-pic" /> -->
-        <i class="fa-solid fa-circle-user"></i>
-      </a>
+      <% if (typeof globalUser !== "undefined") { %>
+        <a href="/profile/<%= globalUser.username %>" class="icon">
+          <img src="<%= globalUser.profilePicture %>" />
+        </a>
+      <% } else { %>
+        <a href="/login" class="icon"><i class="fa-solid fa-circle-user"></i></a>
+      <% } %>
+          
       <a href="/logout" class="icon">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
       </a>
