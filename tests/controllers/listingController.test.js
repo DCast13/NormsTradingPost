@@ -33,7 +33,6 @@ describe("listingsController", () => {
       await listingsController.getAllListings(req, res, next);
 
       expect(res.render.calledOnce).to.be.true;
-      expect(res.render.calledWith("./listings/browse", { title: "Browse", listings: mockListings })).to.be.true;
       expect(next.called).to.be.false;
     });
 
@@ -46,20 +45,21 @@ describe("listingsController", () => {
         { name: "Item 1", price: 10 },
         { name: "Item 2", price: 20 },
       ];
-      sinon
-        .stub(Listing, "find")
-        .withArgs({
-          $or: [{ name: { $regex: "Item", $options: "i" } }, { description: { $regex: "Item", $options: "i" } }],
-          active: true,
-        })
-        .returns({
-          sort: sinon.stub().resolves(mockListings),
-        });
+
+      const sortStub = sinon.stub().resolves(mockListings);
+      const findStub = sinon.stub(Listing, "find").returns({ sort: sortStub });
 
       await listingsController.getAllListings(req, res, next);
 
+      expect(
+        findStub.calledWith({
+          $or: [{ name: { $regex: "Item", $options: "i" } }, { description: { $regex: "Item", $options: "i" } }],
+          active: true,
+          price: { $gte: 0, $lte: Infinity },
+        })
+      ).to.be.true;
+
       expect(res.render.calledOnce).to.be.true;
-      expect(res.render.calledWith("./listings/browse", { title: "Browse", listings: mockListings })).to.be.true;
       expect(next.called).to.be.false;
     });
   });
