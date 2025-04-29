@@ -8,50 +8,68 @@
     <div class="browse-container">
       <!-- Sidebar for filters -->
       <div class="sidebar">
-        <h3>Keywords</h3>
-        <div class="filters">
-          <button>Spring ✕</button>
-          <button>Smart ✕</button>
-          <button>Modern ✕</button>
-        </div>
-
+        <h3>Category</h3>
         <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
+          <label>
+            <input type="radio" name="category" value="" onchange="window.location.href='?<%= search ? 'search=' + encodeURIComponent(search) : '' %><%= sort ? '&sort=' + sort : '' %><%= minPrice ?
+            '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>'" <%= !category ? 'checked' : '' %> /> All Categories
+          </label>
+          <label>
+            <input type="radio" name="category" value="books" onchange="window.location.href='?category=books<%= search ? '&search=' + encodeURIComponent(search) : '' %><%= sort ? '&sort=' + sort : ''
+            %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>'" <%= category === 'books' ? 'checked' : '' %> /> Books
+          </label>
+          <label>
+            <input type="radio" name="category" value="dorm" onchange="window.location.href='?category=dorm<%= search ? '&search=' + encodeURIComponent(search) : '' %><%= sort ? '&sort=' + sort : ''
+            %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>'" <%= category === 'dorm' ? 'checked' : '' %> /> Dorm Essentials
+          </label>
+          <label>
+            <input type="radio" name="category" value="electronics" onchange="window.location.href='?category=electronics<%= search ? '&search=' + encodeURIComponent(search) : '' %><%= sort ? '&sort='
+            + sort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>'" <%= category === 'electronics' ? 'checked' : '' %> /> Electronics
+          </label>
+          <label>
+            <input type="radio" name="category" value="other" onchange="window.location.href='?category=other<%= search ? '&search=' + encodeURIComponent(search) : '' %><%= sort ? '&sort=' + sort : ''
+            %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>'" <%= category === 'other' ? 'checked' : '' %> /> Other
+          </label>
         </div>
 
         <h3>Price</h3>
         <div class="filter-group">
-          <input type="range" min="0" max="100" />
-          <div class="price-range">
-            <span>Asking Price: $0</span>
-            <span>$100</span>
-          </div>
-        </div>
-
-        <h3>Color</h3>
-        <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-        </div>
-
-        <h3>Size</h3>
-        <div class="filter-group">
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
-          <label><input type="checkbox" checked /> Label</label>
+          <form action="/listings/browse" method="GET">
+            <input type="hidden" name="category" value="<%= category %>" />
+            <input type="hidden" name="search" value="<%= search %>" />
+            <input type="hidden" name="sort" value="<%= sort %>" />
+            <label for="minPrice">Min Price</label>
+            <input type="number" id="minPrice" name="minPrice" value="<%= minPrice || '' %>" step="0.01" />
+            <label for="maxPrice">Max Price</label>
+            <input type="number" id="maxPrice" name="maxPrice" value="<%= maxPrice || '' %>" step="0.01" />
+            <button type="submit" class="primary-button">Apply</button>
+          </form>
         </div>
       </div>
 
       <!-- Product Listing -->
       <div class="products-container">
         <div class="sort-buttons">
-          <button class="active">New</button>
-          <button>Price ascending</button>
-          <button>Price descending</button>
-          <button>Rating</button>
+          <a
+            href="?sort=new<%= category ? `&category=${encodeURIComponent(category)}` : '' %><%= search ? `&search=${encodeURIComponent(search)}` : '' %><%= minPrice ? `&minPrice=${minPrice}` : '' %><%= maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+            class="<%= sort === 'new' ? 'active' : '' %>"
+            >Newest</a
+          >
+          <a
+            href="?sort=old<%= category ? `&category=${encodeURIComponent(category)}` : '' %><%= search ? `&search=${encodeURIComponent(search)}` : '' %><%= minPrice ? `&minPrice=${minPrice}` : '' %><%= maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+            class="<%= sort === 'old' ? 'active' : '' %>"
+            >Oldest</a
+          >
+          <a
+            href="?sort=priceAsc<%= category ? `&category=${encodeURIComponent(category)}` : '' %><%= search ? `&search=${encodeURIComponent(search)}` : '' %><%= minPrice ? `&minPrice=${minPrice}` : '' %><%= maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+            class="<%= sort === 'priceAsc' ? 'active' : '' %>"
+            >Price Ascending</a
+          >
+          <a
+            href="?sort=priceDesc<%= category ? `&category=${encodeURIComponent(category)}` : '' %><%= search ? `&search=${encodeURIComponent(search)}` : '' %><%= minPrice ? `&minPrice=${minPrice}` : '' %><%= maxPrice ? `&maxPrice=${maxPrice}` : '' %>"
+            class="<%= sort === 'priceDesc' ? 'active' : '' %>"
+            >Price Descending</a
+          >
         </div>
 
         <div class="product-grid">
@@ -71,5 +89,3 @@
     <%- include('../partials/footer') %>
   </body>
 </html>
-
-<!-- This is a test-->

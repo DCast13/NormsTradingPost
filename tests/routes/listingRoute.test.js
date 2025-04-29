@@ -67,6 +67,7 @@ describe("Listings Routes", () => {
       description: "Description 1",
       image: "image1.jpg",
       seller: { username: "JohnDoe", _id: "user-id" },
+      category: "Other",
     };
 
     const populateStub = sinon.stub().resolves(mockListing);
@@ -101,6 +102,7 @@ describe("Listings Routes", () => {
       .field("condition", "New")
       .field("price", 50)
       .field("description", "A new item description")
+      .field("category", "Other")
       .attach("image", Buffer.from("image content"), "test_image.jpg");
 
     expect(createResponse.status).to.equal(302);

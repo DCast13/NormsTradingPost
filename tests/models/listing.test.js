@@ -29,6 +29,7 @@ describe("Listing Model", () => {
       price: 10.99,
       description: "Short",
       image: "test.jpg",
+      category: "Other",
     });
     try {
       await listing.validate();
@@ -45,6 +46,7 @@ describe("Listing Model", () => {
       price: 10.99,
       description: "A test item description",
       image: "test.jpg",
+      category: "Other",
     });
 
     const savedListing = await listing.save();
@@ -66,6 +68,7 @@ describe("Listing Model", () => {
       price: 10.99,
       description: "A test item description",
       image: "test.jpg",
+      category: "Other",
     });
 
     const savedListing = await listing.save();
@@ -79,6 +82,7 @@ describe("Listing Model", () => {
       price: 0,
       description: "A test item description",
       image: "test.jpg",
+      category: "Other",
     });
     try {
       await listing.validate();
@@ -94,6 +98,7 @@ describe("Listing Model", () => {
       price: 10.99,
       description: "A test item description",
       image: "test.jpg",
+      category: "Other",
     });
     try {
       await listing.validate();
