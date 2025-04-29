@@ -9,8 +9,17 @@
     </a>
     <form action="/listings/browse" method="GET" class="search-form">
       <input type="text" class="search-bar" name="search" placeholder="Search..." value="<%= typeof search !== 'undefined' ? search : '' %>" />
-      <% if (sort) { %>
+      <% if (typeof sort !== "undefined") { %>
         <input type="hidden" name="sort" value="<%= sort %>" />
+      <% } %>
+      <% if (typeof category !== "undefined") { %>
+        <input type="hidden" name="category" value="<%= category %>" />
+      <% } %>
+      <% if (typeof minPrice !== "undefined") { %>
+        <input type="hidden" name="minPrice" value="<%= minPrice %>" />
+      <% } %>
+      <% if (typeof maxPrice !== "undefined") { %>
+        <input type="hidden" name="maxPrice" value="<%= maxPrice %>" />
       <% } %>
       <button type="submit" class="search-button">
         <i class="fa-solid fa-magnifying-glass"></i>

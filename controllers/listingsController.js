@@ -4,54 +4,64 @@ const model = require("../models/listing");
 exports.getAllListings = (req, res, next) => {
   const search = req.query?.search || "";
   const sort = req.query?.sort || "new";
+  const category = req.query?.category || "";
+  const minPrice = parseFloat(req.query?.minPrice) || 0;
+  const maxPrice = parseFloat(req.query?.maxPrice) || Infinity;
 
-  const query = search
-    ? {
-        $or: [{ name: { $regex: search, $options: "i" } }, { description: { $regex: search, $options: "i" } }],
-        active: true,
-      }
-    : { active: true };
+  const query = {
+    active: true,
+    price: { $gte: minPrice, $lte: maxPrice },
+  };
 
-  // Determine the sorting option
-  let sortOption = {};
-  switch (sort) {
-    case "priceAsc":
-      sortOption = { price: 1 }; // Ascending price
-      break;
-    case "priceDesc":
-      sortOption = { price: -1 }; // Descending price
-      break;
-    case "old":
-      sortOption = { createdAt: 1 }; // Oldest first
-      break;
-    default:
-      sortOption = { createdAt: -1 }; // Newest first
+  if (search) {
+    query.$or = [{ name: { $regex: search, $options: "i" } }, { description: { $regex: search, $options: "i" } }];
   }
 
-  // Category filtering
-  const category = req.query.category; // Get category from query parameters
   if (category) {
-    switch (category) {
+    switch (category.toLowerCase()) {
       case "books":
-        query.category = "Books"; // Filter for books
+        query.category = "Books";
         break;
       case "dorm":
-        query.category = "Dorm Essentials"; // Filter for dorm-related items
+        query.category = "Dorm Essentials";
         break;
       case "electronics":
-        query.category = "Electronics"; // Filter for electronics
+        query.category = "Electronics";
         break;
-      default:
-        // No category filter applied
+      case "other":
+        query.category = "Other";
         break;
     }
   }
 
-  // Fetch and sort listings
+  let sortOption = {};
+  switch (sort) {
+    case "priceAsc":
+      sortOption = { price: 1 };
+      break;
+    case "priceDesc":
+      sortOption = { price: -1 };
+      break;
+    case "old":
+      sortOption = { createdAt: 1 };
+      break;
+    default:
+      sortOption = { createdAt: -1 };
+  }
+
   model
     .find(query)
     .sort(sortOption)
-    .then((listings) => res.render("./listings/browse", { listings, search, sort, category }))
+    .then((listings) =>
+      res.render("./listings/browse", {
+        listings,
+        search,
+        sort,
+        category,
+        minPrice: req.query?.minPrice || "",
+        maxPrice: req.query?.maxPrice || "",
+      })
+    )
     .catch((err) => next(err));
 };
 
