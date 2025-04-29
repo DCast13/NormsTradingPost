@@ -10,6 +10,7 @@
       <div class="details">
         <h2><%=listing.name%></h2>
         <h3>$<%=listing.price%></h3>
+        <p><strong>Seller:</strong> <a href="/profile/<%= listing.seller.username %>"><%= listing.seller.username %></a></p>
         <p><%=listing.description%></p>
 
         <% if (typeof globalUser !== "undefined" && globalUser._id.toString() === listing.seller._id.toString()) { %>
