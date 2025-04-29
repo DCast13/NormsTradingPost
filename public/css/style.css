@@ -100,13 +100,15 @@ header {
 }
 
 .search-button {
-  background-color: var(--primary-green);
+  position: relative;
+  right: 43px;
+  top: 50%;
+  background-color: transparent;
   color: var(--white);
   border: none;
-  padding: 10px 15px;
-  border-radius: 20px;
+  padding: 10px;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 16px;
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
@@ -115,7 +117,7 @@ header {
 }
 
 .search-button i {
-  color: var(--primary-gold);
+  color: var(--primary-green);
   font-size: 18px;
   transition: color 0.3s ease;
 }
@@ -375,15 +377,16 @@ section .testimonials {
   margin-bottom: 20px;
 }
 
-.sort-buttons button {
+.sort-buttons a {
   padding: 8px 15px;
   border: none;
   cursor: pointer;
   border-radius: 5px;
 }
 
-.sort-buttons button.active {
+.sort-buttons a.active {
   background-color: var(--secondary-jasper);
+  border: 1px solid var(--primary-green);
 }
 
 .product-grid {

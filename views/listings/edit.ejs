@@ -21,6 +21,14 @@
             <option value="Other" <%= listing && listing.condition === 'Other' ? 'selected' : '' %>>Other</option>
           </select>
 
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="Books" <%= listing && listing.category === 'Books' ? 'selected' : '' %>>Books</option>
+            <option value="Dorm Essentials" <%= listing && listing.category === 'Dorm Essentials' ? 'selected' : '' %>>Dorm Essentials</option>
+            <option value="Electronics" <%= listing && listing.category === 'Electronics' ? 'selected' : '' %>>Electronics</option>
+            <option value="Other" <%= listing && listing.category === 'Other' ? 'selected' : '' %>>Other</option>
+          </select>
+
           <label for="price">Price</label>
           <input type="number" id="price" name="price" value="<%= listing.price %>" step="0.01" required />
 

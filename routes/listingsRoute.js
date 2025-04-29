@@ -12,6 +12,13 @@ router.get("/details/:id", ensureAuthenticated, controller.details);
 // Sell page
 router.get("/sell", ensureAuthenticated, controller.sell);
 
+// Sort listings
+router.get("/", async (req, res) => {
+  const sort = req.query.sort || "new";
+  const listings = await getAllListings(sort);
+  res.render("listings/browse", { listings, sort });
+});
+
 // Create a new listing
 router.post("/", ensureAuthenticated, uploadListingPicture.single("image"), validateListing, controller.create);
 

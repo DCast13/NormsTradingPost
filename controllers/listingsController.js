@@ -5,19 +5,66 @@ const { deleteFile } = require("../middlewares/validator");
 
 // Get all active listings, optionally filtered by a search query
 exports.getAllListings = (req, res, next) => {
-  const search = req.query.search;
+  const search = req.query?.search || "";
+  const sort = req.query?.sort || "new";
+  const category = req.query?.category || "";
+  const minPrice = parseFloat(req.query?.minPrice) || 0;
+  const maxPrice = parseFloat(req.query?.maxPrice) || Infinity;
 
-  const query = search
-    ? {
-        $or: [{ name: { $regex: search, $options: "i" } }, { description: { $regex: search, $options: "i" } }],
-        active: true,
-      }
-    : { active: true };
+  const query = {
+    active: true,
+    price: { $gte: minPrice, $lte: maxPrice },
+  };
+
+  if (search) {
+    query.$or = [{ name: { $regex: search, $options: "i" } }, { description: { $regex: search, $options: "i" } }];
+  }
+
+  if (category) {
+    switch (category.toLowerCase()) {
+      case "books":
+        query.category = "Books";
+        break;
+      case "dorm":
+        query.category = "Dorm Essentials";
+        break;
+      case "electronics":
+        query.category = "Electronics";
+        break;
+      case "other":
+        query.category = "Other";
+        break;
+    }
+  }
+
+  let sortOption = {};
+  switch (sort) {
+    case "priceAsc":
+      sortOption = { price: 1 };
+      break;
+    case "priceDesc":
+      sortOption = { price: -1 };
+      break;
+    case "old":
+      sortOption = { createdAt: 1 };
+      break;
+    default:
+      sortOption = { createdAt: -1 };
+  }
 
   model
     .find(query)
-    .sort({ price: "asc" })
-    .then((listings) => res.render("./listings/browse", { title: "Browse", listings }))
+    .sort(sortOption)
+    .then((listings) =>
+      res.render("./listings/browse", {
+        listings,
+        search,
+        sort,
+        category,
+        minPrice: req.query?.minPrice || "",
+        maxPrice: req.query?.maxPrice || "",
+      })
+    )
     .catch((err) => next(err));
 };
 
