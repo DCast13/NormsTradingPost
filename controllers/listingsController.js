@@ -105,7 +105,7 @@ exports.details = (req, res, next) => {
 
   model
     .findById(id)
-    .populate("seller", "firstName lastName")
+    .populate("seller", "username firstName lastName")
     .then((listing) => {
       if (listing) {
         // Fetch offers for the listing
