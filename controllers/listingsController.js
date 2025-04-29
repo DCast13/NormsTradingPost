@@ -146,7 +146,7 @@ exports.delete = (req, res, next) => {
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     let err = new Error("Id is not valid: " + id);
-    err.status = 500;
+    err.status = 400;
     return next(err);
   }
 
@@ -161,7 +161,6 @@ exports.delete = (req, res, next) => {
 
       // Check if the logged-in user is the owner of the listing
       if (listing.seller.toString() !== req.session.userId) {
-        console.log("Seller ID: ", listing.seller.toString(), " is not User ID: ", req.session.userId);
         let err = new Error("Unauthorized: You are not the owner of this listing.");
         err.status = 403;
         return next(err);
@@ -180,104 +179,101 @@ exports.delete = (req, res, next) => {
 
 // Create an offer for a specific listing by ID
 exports.createOffer = async (req, res, next) => {
-    const listingId = req.params.id;
-    const { amount } = req.body;
-  
-    try {
-      // Validate the offer amount
-      if (!amount || isNaN(amount) || amount <= 0) {
-        throw new Error("Invalid offer amount");
-      }
-  
-      // Check if the listing exists and is active
-      const listing = await model.findById(listingId);
-      if (!listing || !listing.active) {
-        throw new Error("Listing not found or inactive");
-      }
-  
-      // Create a new offer
-      const offer = new Offer({
-        amount,
-        status: "Pending",
-        buyer: req.session.userId,
-        listing: listingId,
-      });
-  
-      await offer.save();
-  
-      // Update the listing's totalOffers and highestOffer
-      await model.findByIdAndUpdate(
-        listingId,
-        {
-          $inc: { totalOffers: 1 },
-          $max: { highestOffer: amount },
-        },
-        { useFindAndModify: false, new: true }
-      );
-  
-      res.redirect(`/listings/details/${listingId}`);
-    } catch (err) {
-      err.status = 400;
-      next(err);
+  const listingId = req.params.id;
+  const { amount } = req.body;
+
+  try {
+    // Validate the offer amount
+    if (!amount || isNaN(amount) || amount <= 0) {
+      throw new Error("Invalid offer amount");
     }
-  };
 
-  exports.acceptOffer = async (req, res, next) => {
-    const offerId = req.params.id;
-  
-    try {
-      // Find the offer and populate its listing
-      const offer = await Offer.findById(offerId).populate('listing');
-      if (!offer) {
-        throw new Error('Offer not found');
-      }
-  
-      // Ensure the current user is the seller of the listing
-      if (offer.listing.seller.toString() !== req.session.userId) {
-        throw new Error('Unauthorized action');
-      }
-  
-      // Update the listing status to "Pending"
-      await model.findByIdAndUpdate(offer.listing._id, { active: false });
-  
-      // Update the offer status to "Accepted"
-      offer.status = 'Accepted';
-      await offer.save();
-  
-      // Reject all other offers for the same listing
-      await Offer.updateMany(
-        { listing: offer.listing._id, _id: { $ne: offerId } },
-        { status: 'Rejected' }
-      );
-  
-      req.flash('success_msg', 'Offer accepted successfully');
-      res.redirect(`/listings/details/${offer.listing._id}`);
-    } catch (err) {
-      next(err);
+    // Check if the listing exists and is active
+    const listing = await model.findById(listingId);
+    if (!listing || !listing.active) {
+      throw new Error("Listing not found or inactive");
     }
-  };
 
-  exports.reactivateListing = async (req, res, next) => {
-    const listingId = req.params.id;
+    // Create a new offer
+    const offer = new Offer({
+      amount,
+      status: "Pending",
+      buyer: req.session.userId,
+      listing: listingId,
+    });
 
-    try {
-        // Find the listing and ensure the current user is the seller
-        const listing = await model.findById(listingId);
-        if (!listing) {
-            throw new Error("Listing not found");
-        }
+    await offer.save();
 
-        if (listing.seller.toString() !== req.session.userId) {
-            throw new Error("Unauthorized action");
-        }
+    // Update the listing's totalOffers and highestOffer
+    await model.findByIdAndUpdate(
+      listingId,
+      {
+        $inc: { totalOffers: 1 },
+        $max: { highestOffer: amount },
+      },
+      { useFindAndModify: false, new: true }
+    );
 
-        // Reactivate the listing
-        listing.active = true;
-        await listing.save();
+    res.redirect(`/listings/details/${listingId}`);
+  } catch (err) {
+    err.status = 400;
+    next(err);
+  }
+};
 
-        req.flash("success_msg", "Listing reactivated successfully");
-        res.redirect(`/listings/details/${listingId}`);
-    } catch (err) {
-        next(err);
+exports.acceptOffer = async (req, res, next) => {
+  const offerId = req.params.id;
+
+  try {
+    // Find the offer and populate its listing
+    const offer = await Offer.findById(offerId).populate("listing");
+    if (!offer) {
+      throw new Error("Offer not found");
     }
+
+    // Ensure the current user is the seller of the listing
+    if (offer.listing.seller.toString() !== req.session.userId) {
+      throw new Error("Unauthorized action");
+    }
+
+    // Update the listing status to "Pending"
+    await model.findByIdAndUpdate(offer.listing._id, { active: false });
+
+    // Update the offer status to "Accepted"
+    offer.status = "Accepted";
+    await offer.save();
+
+    // Reject all other offers for the same listing
+    await Offer.updateMany({ listing: offer.listing._id, _id: { $ne: offerId } }, { status: "Rejected" });
+
+    req.flash("success_msg", "Offer accepted successfully");
+    res.redirect(`/listings/details/${offer.listing._id}`);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.reactivateListing = async (req, res, next) => {
+  const listingId = req.params.id;
+
+  try {
+    // Find the listing and ensure the current user is the seller
+    const listing = await model.findById(listingId);
+    if (!listing) {
+      throw new Error("Listing not found");
+    }
+
+    if (listing.seller.toString() !== req.session.userId) {
+      throw new Error("Unauthorized action");
+    }
+
+    // Reactivate the listing
+    listing.active = true;
+    await listing.save();
+
+    req.flash("success_msg", "Listing reactivated successfully");
+    res.redirect(`/listings/details/${listingId}`);
+  } catch (err) {
+    next(err);
+  }
 };

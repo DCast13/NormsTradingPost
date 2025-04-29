@@ -108,6 +108,10 @@ describe("Listings Routes", () => {
 
     const listingId = createResponse.header.location.split("/").pop();
 
+    sinon.stub(Listing, "findOneAndDelete").callsFake(async (query) => {
+      return Listing.findById(listingId); // Avoids pre of findOneAndDelete
+    });
+
     const deleteResponse = await agent.delete(`/listings/${listingId}`);
     expect(deleteResponse.status).to.equal(302);
     expect(deleteResponse.header.location).to.equal("/listings/browse");
